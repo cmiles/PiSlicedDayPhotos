@@ -1,0 +1,6 @@
+{
+  "DaySlices": 2,
+  "NightSlices": 1,
+  "PhotoStorageDirectory": "C:\\Code\\PhotoTest",
+  "SunriseSunsetCsvFile":  "SunriseAndSunset.csv"
+}

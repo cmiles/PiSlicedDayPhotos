@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{95002431-D0F0-4999-9D4D-46ACC2010D81}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PiSlicedDayPhotos.Utility", "PiSlicedDayPhotos.Utility\PiSlicedDayPhotos.Utility.csproj", "{71A31867-50FC-4F80-9B2B-7A37F5639A1B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PiSlicedDayPhotos", "PiSlicedDayPhotos\PiSlicedDayPhotos.csproj", "{54683027-E175-48C1-815A-2849B1A12871}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{71A31867-50FC-4F80-9B2B-7A37F5639A1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71A31867-50FC-4F80-9B2B-7A37F5639A1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71A31867-50FC-4F80-9B2B-7A37F5639A1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71A31867-50FC-4F80-9B2B-7A37F5639A1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54683027-E175-48C1-815A-2849B1A12871}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54683027-E175-48C1-815A-2849B1A12871}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54683027-E175-48C1-815A-2849B1A12871}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54683027-E175-48C1-815A-2849B1A12871}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5955DDA5-917A-480B-9805-41012C883351}
+	EndGlobalSection
+EndGlobal
