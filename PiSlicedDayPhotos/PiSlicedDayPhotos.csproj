@@ -5,6 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="GitInfo" Version="3.3.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\PiSlicedDayPhotos.Utility\PiSlicedDayPhotos.Utility.csproj" />
   </ItemGroup>
 
@@ -15,6 +22,12 @@
     <None Update="SunriseAndSunset.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <AssemblyAttribute Include = "PiSlicedDayPhotos.Utility.BuildDateAttribute" >
+      <_Parameter1 >$([System.DateTime]::UtcNow.ToString("yyyyMMddHHmmss"))</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 
 </Project>

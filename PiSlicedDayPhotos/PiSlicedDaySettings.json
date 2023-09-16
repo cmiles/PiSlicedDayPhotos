@@ -1,6 +1,7 @@
 {
-  "DaySlices": 2,
-  "NightSlices": 1,
-  "PhotoStorageDirectory": "C:\\Code\\PhotoTest",
-  "SunriseSunsetCsvFile":  "SunriseAndSunset.csv"
+  "DaySlices": 3,
+  "NightSlices": 2,
+  "PhotoStorageDirectory": "../SlicedPhotos",
+  "SunriseSunsetCsvFile": "SunriseAndSunset.csv",
+  "PhotoNamePrefix": "Slice"
 }

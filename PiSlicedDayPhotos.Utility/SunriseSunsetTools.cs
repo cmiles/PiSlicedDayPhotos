@@ -7,6 +7,7 @@ public static class SunriseSunsetTools
     public static DateTime PhotographTime(DateTime referenceDateTime, string sunriseSunsetFileName, int dayDivisions,
         int nightDivisions)
     {
+        Log.Verbose("Starting Next Photo Time Search");
         var startSunriseSunsetSearch = DateOnly.FromDateTime(referenceDateTime.Date.AddDays(-1));
         var endSunriseSunsetSearch = DateOnly.FromDateTime(referenceDateTime.Date.AddDays(1));
 
@@ -14,11 +15,13 @@ public static class SunriseSunsetTools
             SunriseSunsetsFromFile(sunriseSunsetFileName, startSunriseSunsetSearch, endSunriseSunsetSearch)
                 .OrderBy(x => x.ReferenceDate).ToList();
 
-        Console.WriteLine(
+        var resultTextView = string.Join(Environment.NewLine, sunriseSunsetEntries.Select(x =>
+            $"   Reference Date {x.ReferenceDate}, Local Sunrise {x.LocalSunrise}, Local Sunset {x.LocalSunset}"));
+
+        Log.ForContext(nameof(sunriseSunsetEntries), resultTextView).Verbose(
             $"Found {sunriseSunsetEntries.Count} Entries searching {sunriseSunsetFileName} from {startSunriseSunsetSearch} to {endSunriseSunsetSearch}");
-        sunriseSunsetEntries.ForEach(x =>
-            Console.WriteLine(
-                $"   Reference Date {x.ReferenceDate}, Local Sunrise {x.LocalSunrise}, Local Sunset {x.LocalSunset}"));
+
+        Console.WriteLine(resultTextView);
 
         var pastSunrise = sunriseSunsetEntries.Where(x => x.LocalSunrise < referenceDateTime)
             .MinBy(x => referenceDateTime.Subtract(x.LocalSunrise))!.LocalSunrise;
@@ -32,44 +35,48 @@ public static class SunriseSunsetTools
 
         var nightTime = pastSunset > pastSunrise;
 
-        Console.WriteLine($"Nighttime: {nightTime}");
-        Console.WriteLine($"  Past Sunrise: {pastSunrise}");
-        Console.WriteLine($"  Past Sunset: {pastSunset}");
-        Console.WriteLine($"  Next Sunrise: {nextSunrise}");
-        Console.WriteLine($"  Next Sunset: {nextSunset}");
+        Log.Verbose(
+            $"Is Nighttime {nightTime} - Past Sunrise: {pastSunrise} Past Sunset: {pastSunset} -- Next Sunrise: {nextSunrise} Next Sunset: {nextSunset}",
+            nightTime, pastSunrise, pastSunset, nextSunrise, nextSunset);
 
         if (nightTime)
         {
             var nightLength = nextSunrise.Subtract(pastSunset);
-            var nightInterval = TimeSpan.FromSeconds(nightLength.Seconds / nightDivisions);
+            var nightInterval = TimeSpan.FromSeconds(nightLength.TotalSeconds / nightDivisions);
 
-            Console.WriteLine($"Night Length: {nightLength:g} - Night Interval {nightInterval:g}");
+            Log.Verbose($"Night: Night Length: {nightLength:g} - Night Interval {nightInterval:g}");
 
             for (var i = 0; i < nightDivisions; i++)
             {
-                var nextIntervalTime = pastSunset.AddSeconds(nightInterval.Seconds * (i + 1));
+                var nextIntervalTime = pastSunset.AddSeconds(nightInterval.TotalSeconds * (i + 1));
 
                 if (referenceDateTime < nextIntervalTime) return nextIntervalTime;
             }
 
-            Console.WriteLine($"Returning {nextSunrise} as next Photograph Time");
+            Log.Information($"Returning {nextSunrise} as next Photograph Time");
 
             return nextSunrise;
         }
 
         var dayLength = nextSunset.Subtract(pastSunrise);
-        var dayInterval = TimeSpan.FromSeconds(dayLength.Seconds / dayDivisions);
+        var dayInterval = TimeSpan.FromSeconds(dayLength.TotalSeconds / dayDivisions);
 
-        Console.WriteLine($"Day Length: {dayLength:g} - Day Interval {dayInterval:g}");
+        Log.Verbose($"Day: Day Length: {dayLength:g} - Day Interval {dayInterval:g}");
 
         for (var i = 0; i < dayDivisions; i++)
         {
-            var nextIntervalTime = pastSunrise.AddSeconds(dayInterval.Seconds * (i + 1));
+            var nextIntervalTime = pastSunrise.AddSeconds(dayInterval.TotalSeconds * (i + 1));
 
-            if (referenceDateTime < nextIntervalTime) return nextIntervalTime;
+            Console.WriteLine($"  Checking Next Time of {nextIntervalTime} against reference of {referenceDateTime}");
+
+            if (referenceDateTime < nextIntervalTime)
+            {
+                Console.WriteLine($" Returning {nextIntervalTime} as next Photograph Time");
+                return nextIntervalTime;
+            }
         }
 
-        Console.WriteLine($"Returning {nextSunset} as next Photograph Time");
+        Log.Information($"Returning {nextSunset} as next Photograph Time");
 
         return nextSunset;
     }
@@ -96,11 +103,13 @@ public static class SunriseSunsetTools
 
             try
             {
+                if (lineParts[0].Equals("Day", StringComparison.OrdinalIgnoreCase)) continue;
+
                 var sunriseSunsetEntry = new SunriseSunsetEntry()
                 {
                     ReferenceDate = DateOnly.FromDateTime(DateTime.Parse(lineParts[0])),
-                    LocalSunrise = DateTime.Parse(lineParts[1]),
-                    LocalSunset = DateTime.Parse(lineParts[2])
+                    LocalSunrise = DateTime.Parse($"{lineParts[0]} {lineParts[1]}"),
+                    LocalSunset = DateTime.Parse($"{lineParts[0]} {lineParts[2]}")
                 };
 
                 if (sunriseSunsetEntry.ReferenceDate >= startDate && sunriseSunsetEntry.ReferenceDate <= endDate)
