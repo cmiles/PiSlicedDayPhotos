@@ -1,0 +1,12 @@
+[Unit] 
+Description=A Timed Photo Application
+
+[Service]
+ExecStart=/home/[Your Directory Here]/PiSlicedDayPhotos/PiSlicedDayPhotos
+WorkingDirectory=/home/[Your Directory Here]/PiSlicedDayPhotos
+Restart=always
+RestartSec=10
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target

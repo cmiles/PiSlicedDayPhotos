@@ -1,14 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-  </PropertyGroup>
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
   <ItemGroup>
     <PackageReference Include="GitInfo" Version="3.3.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,8 +23,8 @@
   </ItemGroup>
   
   <ItemGroup>
-    <AssemblyAttribute Include = "PiSlicedDayPhotos.Utility.BuildDateAttribute" >
-      <_Parameter1 >$([System.DateTime]::UtcNow.ToString("yyyyMMddHHmmss"))</_Parameter1>
+    <AssemblyAttribute Include="PiSlicedDayPhotos.Utility.BuildDateAttribute">
+      <_Parameter1>$([System.DateTime]::UtcNow.ToString("yyyyMMddHHmmss"))</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 
