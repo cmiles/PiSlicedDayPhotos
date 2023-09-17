@@ -2,7 +2,7 @@
 
 public class SunriseSunsetEntry
 {
-    public DateTime LocalSunrise { get; set; }
-    public DateTime LocalSunset { get; set; }
-    public DateOnly ReferenceDate { get; set; }
+    public DateTime LocalSunrise { get; init; }
+    public DateTime LocalSunset { get; init; }
+    public DateOnly ReferenceDate { get; init; }
 }

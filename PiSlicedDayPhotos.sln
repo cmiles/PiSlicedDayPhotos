@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PiSlicedDayPhotos.Utility",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PiSlicedDayPhotos", "PiSlicedDayPhotos\PiSlicedDayPhotos.csproj", "{54683027-E175-48C1-815A-2849B1A12871}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PiSlicedDayPhotos.Test", "PiSlicedDayPhotos.Test\PiSlicedDayPhotos.Test.csproj", "{C598F6D8-DAE1-4E38-9CD5-B38F7574D8F5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{54683027-E175-48C1-815A-2849B1A12871}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54683027-E175-48C1-815A-2849B1A12871}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54683027-E175-48C1-815A-2849B1A12871}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C598F6D8-DAE1-4E38-9CD5-B38F7574D8F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C598F6D8-DAE1-4E38-9CD5-B38F7574D8F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C598F6D8-DAE1-4E38-9CD5-B38F7574D8F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C598F6D8-DAE1-4E38-9CD5-B38F7574D8F5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

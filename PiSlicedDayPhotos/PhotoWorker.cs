@@ -58,8 +58,6 @@ public class PhotoWorker : BackgroundService
             return;
         }
 
-        Log.Information("Initializing Camera");
-
         Timer? heartBeatTimer = null;
 
         Timer? mainLoop = null;
@@ -69,6 +67,8 @@ public class PhotoWorker : BackgroundService
             heartBeatTimer?.Change(Timeout.Infinite, Timeout.Infinite);
 
             Console.WriteLine();
+
+            var currentPhotoDateTime = _nextTime;
 
             var fileName = Path.Combine(settings.PhotoStorageDirectory,
                 $"{settings.PhotoNamePrefix}{(string.IsNullOrWhiteSpace(settings.PhotoNamePrefix) ? "" : "-")}{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.jpg");
@@ -88,23 +88,38 @@ public class PhotoWorker : BackgroundService
             process.BeginErrorReadLine();
             await process.WaitForExitAsync(stoppingToken);
 
-            _nextTime = SunriseSunsetTools.PhotographTime(DateTime.Now, settings.SunriseSunsetCsvFile,
+            _nextTime = PhotographTimeTools.PhotographTimeFromFile(DateTime.Now, settings.SunriseSunsetCsvFile,
                 settings.DaySlices,
                 settings.NightSlices);
+
+            if (currentPhotoDateTime.Day != _nextTime.Day)
+            {
+                var upcomingSchedule = PhotographTimeTools.PhotographTimeScheduleFromFile(2, currentPhotoDateTime, settings.SunriseSunsetCsvFile,
+                    settings.DaySlices,
+                    settings.NightSlices);
+
+                var scheduleDayGroup = upcomingSchedule.GroupBy(x => x.Date).ToList();
+
+                scheduleDayGroup.ForEach(x => Console.WriteLine($"Schedule for {x.First():M/d}: {string.Join(", ", x.Select(y => y.ToString("h:mm tt")))}"));
+            }
 
             mainLoop?.Change(_nextTime.Subtract(DateTime.Now), Timeout.InfiniteTimeSpan);
 
             Console.WriteLine();
-            Log.Information($"Next Scheduled Photo: {DateTime.Now:O}");
-
-            Console.WriteLine();
-            Console.Write("Heartbeat: ");
 
             heartBeatTimer?.Change(TimeSpan.Zero, TimeSpan.FromMinutes(1));
         }
 
-        _nextTime = SunriseSunsetTools.PhotographTime(DateTime.Now, settings.SunriseSunsetCsvFile, settings.DaySlices,
+        _nextTime = PhotographTimeTools.PhotographTimeFromFile(DateTime.Now, settings.SunriseSunsetCsvFile, settings.DaySlices,
             settings.NightSlices);
+
+        var upcomingSchedule = PhotographTimeTools.PhotographTimeScheduleFromFile(2, DateTime.Now, settings.SunriseSunsetCsvFile,
+            settings.DaySlices,
+            settings.NightSlices);
+
+        var scheduleDayGroup = upcomingSchedule.GroupBy(x => x.Date).ToList();
+
+        scheduleDayGroup.ForEach(x => Console.WriteLine($"Schedule for {x.First():M/d}: {string.Join(", ", x.Select(y => y.ToString("h:mm tt")))}"));
 
         mainLoop = new Timer(HandleTimerCallback, null, _nextTime.Subtract(DateTime.Now), Timeout.InfiniteTimeSpan);
 
