@@ -3,5 +3,6 @@
   "NightSlices": 2,
   "PhotoStorageDirectory": "../SlicedPhotos",
   "SunriseSunsetCsvFile": "SunriseAndSunset.csv",
-  "PhotoNamePrefix": "Slice"
+  "PhotoNamePrefix": "Slice",
+  "LogFullExceptionsToImages": true
 }

@@ -58,13 +58,31 @@ public class PhotoWorker : BackgroundService
             return;
         }
 
-        Timer? heartBeatTimer = null;
+        Timer? heartBeatWatchDogTimer = null;
 
         Timer? mainLoop = null;
 
-        async void HandleTimerCallback(object? state)
+        async void TakePhotographExceptionTrapWrapperCallback(object? state)
         {
-            heartBeatTimer?.Change(Timeout.Infinite, Timeout.Infinite);
+            try
+            {
+                await TakePhotograph();
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Main Photo Loop Error");
+
+                var errorImageFileName = Path.Combine(settings.PhotoStorageDirectory,
+                    $"Error-{settings.PhotoNamePrefix}{(string.IsNullOrWhiteSpace(settings.PhotoNamePrefix) ? "" : "-")}{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.jpg");
+
+                await ExceptionTools.WriteExceptionToImage(e, errorImageFileName, settings.LogFullExceptionsToImages);
+            }
+        }
+
+        async Task TakePhotograph()
+        {
+            //Give the PhotoTakerCallback a chance to run without being interrupted by the watchdog
+            heartBeatWatchDogTimer?.Change(TimeSpan.FromMinutes(3), TimeSpan.FromMinutes(1));
 
             Console.WriteLine();
 
@@ -94,38 +112,79 @@ public class PhotoWorker : BackgroundService
 
             if (currentPhotoDateTime.Day != _nextTime.Day)
             {
-                var upcomingSchedule = PhotographTimeTools.PhotographTimeScheduleFromFile(2, currentPhotoDateTime, settings.SunriseSunsetCsvFile,
+                var upcomingSchedule = PhotographTimeTools.PhotographTimeScheduleFromFile(2, currentPhotoDateTime,
+                    settings.SunriseSunsetCsvFile,
                     settings.DaySlices,
                     settings.NightSlices);
 
                 var scheduleDayGroup = upcomingSchedule.GroupBy(x => x.Date).ToList();
 
-                scheduleDayGroup.ForEach(x => Console.WriteLine($"Schedule for {x.First():M/d}: {string.Join(", ", x.Select(y => y.ToString("h:mm tt")))}"));
+                scheduleDayGroup.ForEach(x =>
+                    Console.WriteLine(
+                        $"Schedule for {x.First():M/d}: {string.Join(", ", x.Select(y => y.ToString("h:mm tt")))}"));
             }
 
             mainLoop?.Change(_nextTime.Subtract(DateTime.Now), Timeout.InfiniteTimeSpan);
 
             Console.WriteLine();
 
-            heartBeatTimer?.Change(TimeSpan.Zero, TimeSpan.FromMinutes(1));
+            //There could be a slightly awkward interaction with the timing change at the top of this method TO
+            //delay the watch dog until after the photo run - but in general the assumption is that the delay
+            //should be more than enough time to execute the photo taking process.
+            heartBeatWatchDogTimer?.Change(TimeSpan.Zero, TimeSpan.FromMinutes(1));
         }
 
-        _nextTime = PhotographTimeTools.PhotographTimeFromFile(DateTime.Now, settings.SunriseSunsetCsvFile, settings.DaySlices,
+        _nextTime = PhotographTimeTools.PhotographTimeFromFile(DateTime.Now, settings.SunriseSunsetCsvFile,
+            settings.DaySlices,
             settings.NightSlices);
 
-        var upcomingSchedule = PhotographTimeTools.PhotographTimeScheduleFromFile(2, DateTime.Now, settings.SunriseSunsetCsvFile,
+        var upcomingSchedule = PhotographTimeTools.PhotographTimeScheduleFromFile(2, DateTime.Now,
+            settings.SunriseSunsetCsvFile,
             settings.DaySlices,
             settings.NightSlices);
 
         var scheduleDayGroup = upcomingSchedule.GroupBy(x => x.Date).ToList();
 
-        scheduleDayGroup.ForEach(x => Console.WriteLine($"Schedule for {x.First():M/d}: {string.Join(", ", x.Select(y => y.ToString("h:mm tt")))}"));
+        scheduleDayGroup.ForEach(x =>
+            Console.WriteLine(
+                $"Schedule for {x.First():M/d}: {string.Join(", ", x.Select(y => y.ToString("h:mm tt")))}"));
 
-        mainLoop = new Timer(HandleTimerCallback, null, _nextTime.Subtract(DateTime.Now), Timeout.InfiniteTimeSpan);
+        mainLoop = new Timer(TakePhotographExceptionTrapWrapperCallback, null, _nextTime.Subtract(DateTime.Now),
+            Timeout.InfiniteTimeSpan);
 
         Log.Information($"Next Scheduled Photo: {_nextTime:O} - {_nextTime.Subtract(DateTime.Now):g}");
 
-        heartBeatTimer = new Timer((_) => { Console.WriteLine($"Photo in {_nextTime.Subtract(DateTime.Now):c}"); },
+        heartBeatWatchDogTimer = new Timer((_) =>
+            {
+                var timeUntilNextPhoto = _nextTime.Subtract(DateTime.Now);
+
+                if (timeUntilNextPhoto.TotalSeconds >= 0)
+                {
+                    Console.WriteLine($"Photo in {_nextTime.Subtract(DateTime.Now):c}");
+                    return;
+                }
+
+                if (timeUntilNextPhoto.TotalMinutes <= -5)
+                {
+                    var nextTime = PhotographTimeTools.PhotographTimeFromFile(DateTime.Now,
+                        settings.SunriseSunsetCsvFile, settings.DaySlices,
+                        settings.NightSlices);
+
+                    Log.ForContext("hint",
+                            "A past next photo time can result from errors in the main photo loop - there should be Log entries prior to this entry that help diagnose any problems.")
+                        .Warning(
+                            $"Photo time of {_nextTime.ToShortOutput()} is in the Past (current time {DateTime.Now.ToShortOutput()}) - resetting Next Time to {nextTime.ToShortOutput()}");
+
+                    _nextTime = nextTime;
+                }
+                else
+                {
+                    Log.ForContext("hint",
+                            "Just in case a negative Next Photo time will resolve due to delays processing the main loop (or error conditions keeping this heartbeat/watchdog loop from running as on the expected schedule negative values less than 5 minutes are logged but tolerated...")
+                        .Information(
+                            $"Photo time of {_nextTime.ToShortOutput()} is in the Past (current time {DateTime.Now.ToShortOutput()})...");
+                }
+            },
             null,
             TimeSpan.Zero,
             TimeSpan.FromMinutes(1));
