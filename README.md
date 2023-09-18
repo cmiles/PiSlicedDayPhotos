@@ -17,6 +17,26 @@ If you are interested in generated Topography compensated Sunrise/Sunset times f
   - [Find Your Location and Compute Sunlight Conditions](https://www.suncurves.com/en/) - a paid service that will do this for you.
   - Various photography apps can calculate/show you this information but I'm not sure if any of them export yearly (or multi-year) data...
 
+
+## Backstory and Setup
+
+For a number of years my wife and I used a previous project - [cmiles/PiDropLapse](https://github.com/cmiles/PiDropLapse/tree/main) - and a [Raspberry Pi 4 Model B](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/) to take periodic photographs and sensor readings to monitor an area inside our house. Since moving to a more rural property I have wanted to do a similar project but outside and solar powered - Raspberry Pi shortages, never quite finding an in-stock dedicated Pi solar setup that I loved and other house project delayed that idea...
+
+Recently we installed a 12V/200aH solar system near our parking area. The main purpose of this system is to power the rodent deterrent lights for our vehicles - but it has more than enough power to also power a Pi for photo purposes!
+
+### Equipment:
+ - [Raspberry Pi 3 Model A+](https://www.raspberrypi.com/products/raspberry-pi-3-model-a-plus/) with [a case from Adafruit](https://www.adafruit.com/product/2359): This is about $32 USD plus shipping - I like both the $25 USD price of the 3 A+ and the selection of ports - more utility that the Zero 2 W, I wouldn't ever use all the ports on a 'full size' 3 or 4.
+ - Wood and Plexiglass Enclosure: Hopefully weatherproof (enough)! Built with spare/scrap wood, left over plexiglass, bug screen sitting in a closet, caulk from another project and the deck paint for the house. The main feature is that I recycled existing materials for this! As you can see in the photos the carpentry is very basic/functional and no details are included.
+ - Solar: As mentioned above the solar system powering this setup wasn't designed primarily to run the Pi - for the sake of documenting the project the main components of the system are listed below. This is not an endorsement or a recommendation, I don't have enough experience to do either of those things, and like most real world system I had constraints and goals that are 100% not in line with 'build the world's best small solar system'! Details like wiring and fuses omitted.
+	- 3x [Newpowa 100W 12V Mono Compact Solar Panels](https://www.newpowa.com/new-100w-compact-12v-mono-solar-panel/)
+	- 2x [Ampere Time 12V 100Ah Lithium Batteries](https://www.amperetime.com/collections/ampere-time-12v-lithium-lifepo4-battery-series/products/ampere-time-12v-100ah-lithium-lifepo4-battery) - purchased used.
+	- [Victron Energy SmartSolar MPPT 100/20](https://www.victronenergy.com/solar-charge-controllers/smartsolar-mppt-75-10-75-15-100-15-100-20)
+	- [Victron Phoenix 12V/800W Inverter](https://www.victronenergy.com/inverters/phoenix-inverter-vedirect-250va-800va) with [Victron VE.Direct Bluetooth Smart Dongle](https://www.victronenergy.com/accessories/ve-direct-bluetooth-smart-dongle)
+	- [Victron SmartShunt](https://www.victronenergy.com/battery-monitors/smart-battery-shunt)
+	- [Raspberry Pi 3 Model A+](https://www.raspberrypi.com/products/raspberry-pi-3-model-a-plus/) running the [Victron Energy Venus OS](https://github.com/victronenergy/venus) to provide communication between the system and the [Victron Remote Monitoring System](https://www.victronenergy.com/panel-systems-remote-monitoring/vrm). See [Panbo's Raspberry Pi Victron Venus OS Install post](https://panbo.com/victrons-venus-os-on-a-raspberry-pi-install-and-configuration/) and as of 9/18/2023 see [Raspberry Pi 3A+: VRM Portal ID Missing](https://community.victronenergy.com/questions/79169/raspberry-pi-3a-vrm-id-missing.html) for critical information on getting Venus OS working correctly on the 3 A+. I used 2 [VE.Direct to USB interface cables](https://www.victronenergy.com/accessories/ve-direct-to-usb-interface) to connect the SmartSolar and SmartShunt to the Pi (currently the Bluetooth interface on the SmartSolar and SmartShunt is NOT used to connect to Victron Venus OS/Cerbo GX units! The Bluetooth does create a pretty great app experience, at least on Android...).
+
+## Tools and Libraries
+
 This program would not be possible without the amazing resources available for creating Free software! Used in this project:
 
 **Tools:**
