@@ -7,7 +7,7 @@ namespace PiSlicedDayPhotos;
 
 public class PhotoWorker : BackgroundService
 {
-    private DateTime _nextTime;
+    private ScheduledPhoto _nextTime;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -91,11 +91,23 @@ public class PhotoWorker : BackgroundService
             var fileName = Path.Combine(settings.PhotoStorageDirectory,
                 $"{settings.PhotoNamePrefix}{(string.IsNullOrWhiteSpace(settings.PhotoNamePrefix) ? "" : "-")}{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.jpg");
 
-            Log.Information($"Taking Photo at {DateTime.Now:O} - {fileName}");
+            var arguments = currentPhotoDateTime.Kind switch
+            {
+                PhotoKind.Day => settings.LibCameraParametersDay,
+                PhotoKind.Night => settings.LibCameraParametersNight,
+                PhotoKind.Sunrise => settings.LibCameraParametersSunrise,
+                PhotoKind.Sunset => settings.LibCameraParametersSunset,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            var photoExecutable = "libcamera-still";
+            var photoArguments = $"-o {fileName} {arguments}".Trim();
+
+            Log.Information($"Taking Photo at {DateTime.Now:O} - {photoExecutable} {photoArguments}");
 
             var process = new Process();
-            process.StartInfo.FileName = "libcamera-still";
-            process.StartInfo.Arguments = $"-o {fileName}";
+            process.StartInfo.FileName = photoExecutable;
+            process.StartInfo.Arguments = photoArguments;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
@@ -106,25 +118,37 @@ public class PhotoWorker : BackgroundService
             process.BeginErrorReadLine();
             await process.WaitForExitAsync(stoppingToken);
 
+            try
+            {
+                var newSettings = JsonSerializer.Deserialize<PiSlicedDaySettings>(
+                    await File.ReadAllTextAsync(settingsFile.FullName, stoppingToken));
+
+                if(newSettings == null) settings = newSettings;
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Problem Re-Reading Settings File {settingsFile}", settingsFile.FullName);
+            }
+
             _nextTime = PhotographTimeTools.PhotographTimeFromFile(DateTime.Now, settings.SunriseSunsetCsvFile,
                 settings.DaySlices,
                 settings.NightSlices);
 
-            if (currentPhotoDateTime.Day != _nextTime.Day)
+            if (currentPhotoDateTime.ScheduledTime.Day != _nextTime.ScheduledTime.Day)
             {
-                var upcomingSchedule = PhotographTimeTools.PhotographTimeScheduleFromFile(2, currentPhotoDateTime,
+                var upcomingSchedule = PhotographTimeTools.PhotographTimeScheduleFromFile(2, currentPhotoDateTime.ScheduledTime,
                     settings.SunriseSunsetCsvFile,
                     settings.DaySlices,
                     settings.NightSlices);
 
-                var scheduleDayGroup = upcomingSchedule.GroupBy(x => x.Date).ToList();
+                var scheduleDayGroup = upcomingSchedule.GroupBy(x => x.ScheduledTime.Date).ToList();
 
                 scheduleDayGroup.ForEach(x =>
                     Console.WriteLine(
-                        $"Schedule for {x.First():M/d}: {string.Join(", ", x.Select(y => y.ToString("h:mm tt")))}"));
+                        $"Schedule for {x.First():M/d}: {string.Join(", ", x.Select(y => y.ScheduledTime.ToString("h:mm tt")))}"));
             }
 
-            mainLoop?.Change(_nextTime.Subtract(DateTime.Now), Timeout.InfiniteTimeSpan);
+            mainLoop?.Change(_nextTime.ScheduledTime.Subtract(DateTime.Now), Timeout.InfiniteTimeSpan);
 
             Console.WriteLine();
 
@@ -143,24 +167,24 @@ public class PhotoWorker : BackgroundService
             settings.DaySlices,
             settings.NightSlices);
 
-        var scheduleDayGroup = upcomingSchedule.GroupBy(x => x.Date).ToList();
+        var scheduleDayGroup = upcomingSchedule.GroupBy(x => x.ScheduledTime.Date).ToList();
 
         scheduleDayGroup.ForEach(x =>
             Console.WriteLine(
-                $"Schedule for {x.First():M/d}: {string.Join(", ", x.Select(y => y.ToString("h:mm tt")))}"));
+                $"Schedule for {x.First():M/d}: {string.Join(", ", x.Select(y => y.ScheduledTime.ToString("h:mm tt")))}"));
 
-        mainLoop = new Timer(TakePhotographExceptionTrapWrapperCallback, null, _nextTime.Subtract(DateTime.Now),
+        mainLoop = new Timer(TakePhotographExceptionTrapWrapperCallback, null, _nextTime.ScheduledTime.Subtract(DateTime.Now),
             Timeout.InfiniteTimeSpan);
 
-        Log.Information($"Next Scheduled Photo: {_nextTime:O} - {_nextTime.Subtract(DateTime.Now):g}");
+        Log.Information($"Next Scheduled Photo: {_nextTime:O} - {_nextTime.ScheduledTime.Subtract(DateTime.Now):g}");
 
         heartBeatWatchDogTimer = new Timer((_) =>
             {
-                var timeUntilNextPhoto = _nextTime.Subtract(DateTime.Now);
+                var timeUntilNextPhoto = _nextTime.ScheduledTime.Subtract(DateTime.Now);
 
                 if (timeUntilNextPhoto.TotalSeconds >= 0)
                 {
-                    Console.WriteLine($"Photo in {_nextTime.Subtract(DateTime.Now):c}");
+                    Console.WriteLine($"Photo in {_nextTime.ScheduledTime.Subtract(DateTime.Now):c}");
                     return;
                 }
 
@@ -173,7 +197,7 @@ public class PhotoWorker : BackgroundService
                     Log.ForContext("hint",
                             "A past next photo time can result from errors in the main photo loop - there should be Log entries prior to this entry that help diagnose any problems.")
                         .Warning(
-                            $"Photo time of {_nextTime.ToShortOutput()} is in the Past (current time {DateTime.Now.ToShortOutput()}) - resetting Next Time to {nextTime.ToShortOutput()}");
+                            $"Photo time of {_nextTime.ScheduledTime.ToShortOutput()} is in the Past (current time {DateTime.Now.ToShortOutput()}) - resetting Next Time to {nextTime.ScheduledTime.ToShortOutput()}");
 
                     _nextTime = nextTime;
                 }
@@ -182,7 +206,7 @@ public class PhotoWorker : BackgroundService
                     Log.ForContext("hint",
                             "Just in case a negative Next Photo time will resolve due to delays processing the main loop (or error conditions keeping this heartbeat/watchdog loop from running as on the expected schedule negative values less than 5 minutes are logged but tolerated...")
                         .Information(
-                            $"Photo time of {_nextTime.ToShortOutput()} is in the Past (current time {DateTime.Now.ToShortOutput()})...");
+                            $"Photo time of {_nextTime.ScheduledTime.ToShortOutput()} is in the Past (current time {DateTime.Now.ToShortOutput()})...");
                 }
             },
             null,

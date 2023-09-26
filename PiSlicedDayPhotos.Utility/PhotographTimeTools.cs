@@ -4,7 +4,8 @@ namespace PiSlicedDayPhotos.Utility;
 
 public static class PhotographTimeTools
 {
-    public static DateTime PhotographTime(DateTime referenceDateTime, List<SunriseSunsetEntry> allSunriseSunsetEntries,
+    public static ScheduledPhoto PhotographTime(DateTime referenceDateTime,
+        List<SunriseSunsetEntry> allSunriseSunsetEntries,
         int dayDivisions,
         int nightDivisions)
     {
@@ -13,7 +14,7 @@ public static class PhotographTimeTools
         var endSunriseSunsetSearch = DateOnly.FromDateTime(referenceDateTime.Date.AddDays(1));
 
         var sunriseSunsetEntries = allSunriseSunsetEntries.Where(x =>
-                       x.ReferenceDate >= startSunriseSunsetSearch && x.ReferenceDate <= endSunriseSunsetSearch).ToList();
+            x.ReferenceDate >= startSunriseSunsetSearch && x.ReferenceDate <= endSunriseSunsetSearch).ToList();
 
         var resultTextView = string.Join(Environment.NewLine, sunriseSunsetEntries.Select(x =>
             $"   Reference Date {x.ReferenceDate.ToShortOutput()}, Local Sunrise {x.LocalSunrise.ToShortOutput()}, Local Sunset {x.LocalSunset.ToShortOutput()}"));
@@ -51,13 +52,13 @@ public static class PhotographTimeTools
                 if (referenceDateTime < nextIntervalTime)
                 {
                     Console.WriteLine($" Returning {nextIntervalTime.ToShortOutput()} as next Photograph Time");
-                    return nextIntervalTime;
+                    return new ScheduledPhoto { Kind = PhotoKind.Night, ScheduledTime = nextIntervalTime };
                 }
             }
 
             Log.Information($"Returning Next Sunrise - {nextSunrise.ToShortOutput()} - as next Photograph Time");
 
-            return nextSunrise;
+            return new ScheduledPhoto { Kind = PhotoKind.Sunrise, ScheduledTime = nextSunrise };
         }
 
         var dayLength = nextSunset.Subtract(pastSunrise);
@@ -72,16 +73,16 @@ public static class PhotographTimeTools
             if (referenceDateTime < nextIntervalTime)
             {
                 Console.WriteLine($" Returning {nextIntervalTime.ToShortOutput()} as next Photograph Time");
-                return nextIntervalTime;
+                return new ScheduledPhoto { Kind = PhotoKind.Day, ScheduledTime = nextIntervalTime };
             }
         }
 
         Log.Information($"Returning Next Sunset - {nextSunset.ToShortOutput()} - as next Photograph Time");
 
-        return nextSunset;
+        return new ScheduledPhoto { Kind = PhotoKind.Sunset, ScheduledTime = nextSunset };
     }
 
-    public static DateTime PhotographTimeFromFile(DateTime referenceDateTime, string sunriseSunsetFileName,
+    public static ScheduledPhoto PhotographTimeFromFile(DateTime referenceDateTime, string sunriseSunsetFileName,
         int dayDivisions,
         int nightDivisions)
     {
@@ -96,7 +97,7 @@ public static class PhotographTimeTools
         return PhotographTime(referenceDateTime, sunriseSunsetEntries, dayDivisions, nightDivisions);
     }
 
-    public static DateTime PhotographTimeFromString(DateTime referenceDateTime, string sunriseSunsetString,
+    public static ScheduledPhoto PhotographTimeFromString(DateTime referenceDateTime, string sunriseSunsetString,
         int dayDivisions,
         int nightDivisions)
     {
@@ -111,35 +112,35 @@ public static class PhotographTimeTools
         return PhotographTime(referenceDateTime, sunriseSunsetEntries, dayDivisions, nightDivisions);
     }
 
-    public static List<DateTime> PhotographTimeSchedule(int days, DateTime startDateTime,
+    public static List<ScheduledPhoto> PhotographTimeSchedule(int days, DateTime startDateTime,
         List<SunriseSunsetEntry> sunriseSunsetEntries,
         int dayDivisions, int nightDivisions)
     {
         var endDateTime = startDateTime.AddDays(days);
 
 
-        var returnList = new List<DateTime>();
+        var returnList = new List<ScheduledPhoto>();
 
         var nextPhotographTime =
             PhotographTime(startDateTime, sunriseSunsetEntries, dayDivisions, nightDivisions);
 
-        if (nextPhotographTime > endDateTime)
+        if (nextPhotographTime.ScheduledTime > endDateTime)
             return returnList;
 
         returnList.Add(nextPhotographTime);
 
         do
         {
-            nextPhotographTime = PhotographTime(nextPhotographTime.AddSeconds(1), sunriseSunsetEntries,
+            nextPhotographTime = PhotographTime(nextPhotographTime.ScheduledTime.AddSeconds(1), sunriseSunsetEntries,
                 dayDivisions,
                 nightDivisions);
-            if (nextPhotographTime <= endDateTime) returnList.Add(nextPhotographTime);
-        } while (nextPhotographTime <= endDateTime);
+            if (nextPhotographTime.ScheduledTime <= endDateTime) returnList.Add(nextPhotographTime);
+        } while (nextPhotographTime.ScheduledTime <= endDateTime);
 
         return returnList;
     }
 
-    public static List<DateTime> PhotographTimeScheduleFromFile(int days, DateTime startDateTime,
+    public static List<ScheduledPhoto> PhotographTimeScheduleFromFile(int days, DateTime startDateTime,
         string sunriseSunsetFileName,
         int dayDivisions, int nightDivisions)
     {
@@ -148,7 +149,7 @@ public static class PhotographTimeTools
         return PhotographTimeSchedule(days, startDateTime, entries, dayDivisions, nightDivisions);
     }
 
-    public static List<DateTime> PhotographTimeScheduleFromString(int days, DateTime startDateTime,
+    public static List<ScheduledPhoto> PhotographTimeScheduleFromString(int days, DateTime startDateTime,
         string sunriseSunsetString,
         int dayDivisions, int nightDivisions)
     {
