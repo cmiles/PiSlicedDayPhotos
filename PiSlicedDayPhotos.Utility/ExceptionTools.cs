@@ -16,12 +16,12 @@ public static class ExceptionTools
     /// <param name="fullFileName"></param>
     /// <param name="writeAllExceptionInformation"></param>
     /// <returns></returns>
-    public static async Task WriteExceptionToImage(Exception? exception, string fullFileName,
+    public static async Task WriteExceptionToImage(string message, Exception? exception, string fullFileName,
         bool writeAllExceptionInformation)
     {
         try
         {
-            await WriteExceptionToImageInner(exception, fullFileName, writeAllExceptionInformation);
+            await WriteExceptionToImageInner(message, exception, fullFileName, writeAllExceptionInformation);
         }
         catch (Exception e)
         {
@@ -34,11 +34,12 @@ public static class ExceptionTools
     ///     will silently trap and log errors - it is unlikely that you want the execution of your program to stop
     ///     because an image error message could not be written??
     /// </summary>
+    /// <param name="message"></param>
     /// <param name="exception"></param>
     /// <param name="fullFileName"></param>
     /// <param name="writeAllExceptionInformation"></param>
     /// <returns></returns>
-    private static async Task WriteExceptionToImageInner(Exception? exception, string fullFileName,
+    private static async Task WriteExceptionToImageInner(string message, Exception? exception, string fullFileName,
         bool writeAllExceptionInformation)
     {
         // Create a RichString
@@ -51,6 +52,13 @@ public static class ExceptionTools
             .FontSize(14)
             .Add("The Pi Sliced Day Photo program encountered an error - this could be temporary, but may need " +
                  "attention... The programs logs may have more information.");
+
+        if (!string.IsNullOrWhiteSpace(message))
+        {
+            rs.Paragraph().Alignment(TextAlignment.Left)
+                .FontSize(18)
+                .Add(message);
+        }
 
         if (writeAllExceptionInformation)
             while (exception != null)

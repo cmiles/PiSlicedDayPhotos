@@ -9,7 +9,7 @@ public static class PhotographTimeTools
         int dayDivisions,
         int nightDivisions)
     {
-        Log.Verbose("Starting Next Photo Time Search");
+        Console.WriteLine("Starting Next Photo Time Search");
         var startSunriseSunsetSearch = DateOnly.FromDateTime(referenceDateTime.Date.AddDays(-1));
         var endSunriseSunsetSearch = DateOnly.FromDateTime(referenceDateTime.Date.AddDays(1));
 
@@ -18,9 +18,6 @@ public static class PhotographTimeTools
 
         var resultTextView = string.Join(Environment.NewLine, sunriseSunsetEntries.Select(x =>
             $"   Reference Date {x.ReferenceDate.ToShortOutput()}, Local Sunrise {x.LocalSunrise.ToShortOutput()}, Local Sunset {x.LocalSunset.ToShortOutput()}"));
-
-        Log.ForContext(nameof(sunriseSunsetEntries), resultTextView).Verbose(
-            $"Found {sunriseSunsetEntries.Count} Entries searching from {startSunriseSunsetSearch.ToShortOutput()} to {endSunriseSunsetSearch.ToShortOutput()}");
 
         var pastSunrise = sunriseSunsetEntries.Where(x => x.LocalSunrise < referenceDateTime)
             .MinBy(x => referenceDateTime.Subtract(x.LocalSunrise))!.LocalSunrise;
@@ -34,7 +31,7 @@ public static class PhotographTimeTools
 
         var nightTime = pastSunset > pastSunrise;
 
-        Log.Verbose(
+        Console.WriteLine(
             $"Is Nighttime {nightTime} - Past Sunrise: {pastSunrise.ToShortOutput()} Past Sunset: {pastSunset.ToShortOutput()} -- Next Sunrise: {nextSunrise.ToShortOutput()} Next Sunset: {nextSunset.ToShortOutput()}",
             nightTime, pastSunrise, pastSunset, nextSunrise, nextSunset);
 
@@ -43,7 +40,7 @@ public static class PhotographTimeTools
             var nightLength = nextSunrise.Subtract(pastSunset);
             var nightInterval = TimeSpan.FromSeconds(nightLength.TotalSeconds / (nightDivisions + 1));
 
-            Log.Verbose($"Night: Night Length: {nightLength:c} - Night Interval {nightInterval:c}");
+            Console.WriteLine($"Night: Night Length: {nightLength:c} - Night Interval {nightInterval:c}");
 
             for (var i = 1; i <= nightDivisions; i++)
             {
@@ -56,7 +53,7 @@ public static class PhotographTimeTools
                 }
             }
 
-            Log.Information($"Returning Next Sunrise - {nextSunrise.ToShortOutput()} - as next Photograph Time");
+            Console.WriteLine($"Returning Next Sunrise - {nextSunrise.ToShortOutput()} - as next Photograph Time");
 
             return new ScheduledPhoto { Kind = PhotoKind.Sunrise, ScheduledTime = nextSunrise };
         }
@@ -64,7 +61,7 @@ public static class PhotographTimeTools
         var dayLength = nextSunset.Subtract(pastSunrise);
         var dayInterval = TimeSpan.FromSeconds(dayLength.TotalSeconds / (dayDivisions + 1));
 
-        Log.Verbose($"Day: Day Length: {dayLength:c} - Day Interval {dayInterval:c}");
+        Console.WriteLine($"Day: Day Length: {dayLength:c} - Day Interval {dayInterval:c}");
 
         for (var i = 1; i <= dayDivisions; i++)
         {
@@ -77,7 +74,7 @@ public static class PhotographTimeTools
             }
         }
 
-        Log.Information($"Returning Next Sunset - {nextSunset.ToShortOutput()} - as next Photograph Time");
+        Console.WriteLine($"Returning Next Sunset - {nextSunset.ToShortOutput()} - as next Photograph Time");
 
         return new ScheduledPhoto { Kind = PhotoKind.Sunset, ScheduledTime = nextSunset };
     }
@@ -86,7 +83,7 @@ public static class PhotographTimeTools
         int dayDivisions,
         int nightDivisions)
     {
-        Log.Verbose("Starting Next Photo Time Search");
+        Console.WriteLine("Starting Next Photo Time Search");
         var startSunriseSunsetSearch = DateOnly.FromDateTime(referenceDateTime.Date.AddDays(-1));
         var endSunriseSunsetSearch = DateOnly.FromDateTime(referenceDateTime.Date.AddDays(1));
 
@@ -101,7 +98,7 @@ public static class PhotographTimeTools
         int dayDivisions,
         int nightDivisions)
     {
-        Log.Verbose("Starting Next Photo Time Search");
+        Console.WriteLine("Starting Next Photo Time Search");
         var startSunriseSunsetSearch = DateOnly.FromDateTime(referenceDateTime.Date.AddDays(-1));
         var endSunriseSunsetSearch = DateOnly.FromDateTime(referenceDateTime.Date.AddDays(1));
 
@@ -202,7 +199,7 @@ public static class PhotographTimeTools
             catch (Exception e)
             {
                 Log.ForContext("line", loopLines).Error(e,
-                    "Invalid Entry in Sunrise Sunset Lines - Line Number {lineNumber}",
+                    "[Photograph Time Tools] Invalid Entry in Sunrise Sunset Lines - Line Number {lineNumber}",
                     lineCounter);
             }
         }

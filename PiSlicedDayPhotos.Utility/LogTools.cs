@@ -31,7 +31,7 @@ public static class LogTools
 
     public static LoggerConfiguration LogToConsole(this LoggerConfiguration toConfigure)
     {
-        return toConfigure.MinimumLevel.Verbose().WriteTo.Console();
+        return toConfigure.MinimumLevel.Debug().WriteTo.Console();
     }
 
     public static LoggerConfiguration LogToFileInProgramDirectory(this LoggerConfiguration toConfigure,
@@ -42,6 +42,19 @@ public static class LogTools
         return toConfigure.MinimumLevel.Verbose().WriteTo.File(new CompactJsonFormatter(),
             Path.Combine(programDirectory, $"1_Log-{fileNameFragment}.json"), rollingInterval: RollingInterval.Day,
             retainedFileCountLimit: 30);
+    }
+
+    /// <summary>
+    ///     Returns a simple string representation of an object with a Max Depth of 2 to avoid unexpected
+    ///     problems and provide generally appropriate output for logging.
+    /// </summary>
+    /// <param name="toDump"></param>
+    /// <returns></returns>
+    public static string SafeObjectDump(this object? toDump)
+    {
+        return toDump is null
+            ? "null"
+            : ObjectDumper.Dump(toDump, new DumpOptions { MaxLevel = 2, DumpStyle = DumpStyle.Console });
     }
 
     public static void StandardStaticLoggerForProgramDirectory(string fileNameFragment)
