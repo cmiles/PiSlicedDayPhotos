@@ -7,6 +7,6 @@
   "LogFullExceptionsToImages": true,
   "LibCameraParametersDay": "--autofocus-mode manual --lens-position 0 --awb auto --metering average --denoise cdn_hq",
   "LibCameraParametersNight": "--autofocus-mode manual --lens-position 0 --shutter 60000000 --awb auto --denoise cdn_hq",
-  "LibCameraParametersSunset": "--autofocus-mode manual --lens-position 0 --awb auto --metering average --denoise cdn_hq",
+  "LibCameraParametersSunset": "--autofocus-mode manual --lens-position 0 --ev -2 --awb auto --metering average --denoise cdn_hq",
   "LibCameraParametersSunrise": "--autofocus-mode manual --lens-position 0  --awb auto --metering average --denoise cdn_hq"
 }

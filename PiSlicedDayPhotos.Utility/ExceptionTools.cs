@@ -46,10 +46,12 @@ public static class ExceptionTools
         var rs = new RichString()
             .Alignment(TextAlignment.Center)
             .FontFamily("Segoe UI")
-            .MarginBottom(20)
+            .FontSize(26)
+            .TextColor(SKColors.Black)
+            .MarginBottom(16)
             .Add("Pi Sliced Day Photo Error", fontSize: 24, fontWeight: 700)
             .Paragraph().Alignment(TextAlignment.Left)
-            .FontSize(14)
+            .FontSize(18)
             .Add("The Pi Sliced Day Photo program encountered an error - this could be temporary, but may need " +
                  "attention... The programs logs may have more information.");
 
@@ -57,6 +59,8 @@ public static class ExceptionTools
         {
             rs.Paragraph().Alignment(TextAlignment.Left)
                 .FontSize(18)
+                .MarginTop(48)
+                .MarginBottom(64)
                 .Add(message);
         }
 
@@ -70,7 +74,6 @@ public static class ExceptionTools
                     .MarginBottom(10)
                     .MarginLeft(10)
                     .FontSize(16)
-                    .BackgroundColor(SKColors.LightSalmon)
                     .Add(exception.Message)
                     .Paragraph()
                     .MarginTop(10)
@@ -78,7 +81,6 @@ public static class ExceptionTools
                     .MarginBottom(10)
                     .MarginLeft(20)
                     .FontSize(14)
-                    .BackgroundColor(SKColors.LightSalmon)
                     .Add(exception.ToString());
 
                 exception = exception.InnerException;
@@ -86,9 +88,16 @@ public static class ExceptionTools
 
         rs.MaxWidth = 984;
 
+        SKPaint fillPaint = new SKPaint
+        {
+            Style = SKPaintStyle.Fill,
+            Color = SKColors.White
+        };
+
         var imageInfo = new SKImageInfo(1024, (int)rs.MeasuredHeight + 40);
         using var surface = SKSurface.Create(imageInfo);
         using var canvas = surface.Canvas;
+        canvas.Clear(SKColors.White);
         rs.Paint(canvas, new SKPoint(20, 20));
 
         using var image = surface.Snapshot();

@@ -10,6 +10,12 @@ public class PhotoWorker : BackgroundService
     private ScheduledPhoto _nextTime = new()
         { Kind = PhotoKind.Day, ScheduledTime = new DateTime(2012, 1, 12, 12, 0, 0) };
 
+    private string ErrorImageFileName(PiSlicedDaySettings serSettings)
+    {
+        return Path.Combine(serSettings.PhotoStorageDirectory,
+            $"Error-{serSettings.PhotoNamePrefix}{(string.IsNullOrWhiteSpace(serSettings.PhotoNamePrefix) ? "" : "-")}{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.jpg");
+    }
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var settingsFile = new FileInfo(Path.Combine(AppContext.BaseDirectory, "PiSlicedDaySettings.json"));
@@ -73,10 +79,7 @@ public class PhotoWorker : BackgroundService
             {
                 Log.Error(e, "[General] Main Photograph Loop Error");
 
-                var errorImageFileName = Path.Combine(settings.PhotoStorageDirectory,
-                    $"Error-{settings.PhotoNamePrefix}{(string.IsNullOrWhiteSpace(settings.PhotoNamePrefix) ? "" : "-")}{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.jpg");
-
-                await ExceptionTools.WriteExceptionToImage(string.Empty, e, errorImageFileName,
+                await ExceptionTools.WriteExceptionToImage(string.Empty, e, ErrorImageFileName(settings),
                     settings.LogFullExceptionsToImages);
             }
         }
@@ -144,12 +147,10 @@ public class PhotoWorker : BackgroundService
                         "[Photograph] Problem Running libcamera-still - {executable} {arguments}", photoExecutable,
                         photoArguments);
 
-                var errorImageFileName = Path.Combine(settings.PhotoStorageDirectory,
-                    $"Error-{settings.PhotoNamePrefix}{(string.IsNullOrWhiteSpace(settings.PhotoNamePrefix) ? "" : "-")}{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.jpg");
-
                 await ExceptionTools.WriteExceptionToImage(
-                    $"{photoExecutable} {photoArguments}{Environment.NewLine}{Environment.NewLine}{string.Join(Environment.NewLine, photoDataList)}",
-                    e, errorImageFileName, settings.LogFullExceptionsToImages);
+                    $"[Photograph] Problem Running libcamera-still - {photoExecutable} {photoArguments}{Environment.NewLine}{Environment.NewLine}{string.Join(Environment.NewLine, photoDataList)}",
+                    e, ErrorImageFileName(settings),
+                    settings.LogFullExceptionsToImages);
             }
 
             PiSlicedDaySettings? newSettings = null;
@@ -164,6 +165,11 @@ public class PhotoWorker : BackgroundService
                 Log.Error(e,
                     "[Settings] Problem Refreshing Settings from File {settingsFile} - Continuing with Existing Settings",
                     settingsFile.FullName);
+
+                await ExceptionTools.WriteExceptionToImage(
+                    $"Problem Refreshing Settings from File {settingsFile.FullName} - Continuing with Existing Settings.{Environment.NewLine}{Environment.NewLine}Existing Settings:{Environment.NewLine}{JsonSerializer.Serialize(settings, new JsonSerializerOptions() { WriteIndented = true })}",
+                    e, ErrorImageFileName(settings),
+                    settings.LogFullExceptionsToImages);
             }
 
             if (newSettings == null) settings = newSettings;

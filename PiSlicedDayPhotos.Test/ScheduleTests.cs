@@ -65,7 +65,15 @@ public class ScheduleTests
             .Select(DateTime.Parse).ToList();
 
         Assert.That(schedule.Count, Is.EqualTo(8));
-        Assert.That(schedule, Is.EquivalentTo(expectedDateTimeResults));
+        Assert.That(schedule.Select(x => x.ScheduledTime).ToList(), Is.EquivalentTo(expectedDateTimeResults));
+        Assert.That(schedule[0].Kind, Is.EqualTo(PhotoKind.Night));
+        Assert.That(schedule[1].Kind, Is.EqualTo(PhotoKind.Sunrise));
+        Assert.That(schedule[2].Kind, Is.EqualTo(PhotoKind.Day));
+        Assert.That(schedule[3].Kind, Is.EqualTo(PhotoKind.Sunset));
+        Assert.That(schedule[4].Kind, Is.EqualTo(PhotoKind.Night));
+        Assert.That(schedule[5].Kind, Is.EqualTo(PhotoKind.Sunrise));
+        Assert.That(schedule[6].Kind, Is.EqualTo(PhotoKind.Day));
+        Assert.That(schedule[7].Kind, Is.EqualTo(PhotoKind.Sunset));
     }
 
     [Test]
@@ -77,8 +85,8 @@ public class ScheduleTests
         var schedule = PhotographTimeTools.PhotographTimeSchedule(6, new DateTime(2023, 1, 22), entries, 0, 0);
 
         Assert.That(schedule.Count, Is.EqualTo(12));
-        Assert.That(schedule.First, Is.EqualTo(DateTime.Parse("1/22/2023 08:13:00-0700")));
-        Assert.That(schedule.Last, Is.EqualTo(DateTime.Parse("1/27/2023 17:45:00-0700")));
+        Assert.That(schedule.First().ScheduledTime, Is.EqualTo(DateTime.Parse("1/22/2023 08:13:00-0700")));
+        Assert.That(schedule.Last().ScheduledTime, Is.EqualTo(DateTime.Parse("1/27/2023 17:45:00-0700")));
     }
 
     [Test]
