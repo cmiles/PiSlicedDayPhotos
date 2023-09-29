@@ -5,5 +5,6 @@ public enum PhotoKind
     Day,
     Night,
     Sunrise,
-    Sunset
+    Sunset,
+    Custom
 }

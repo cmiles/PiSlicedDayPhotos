@@ -1,9 +1,97 @@
-﻿using Serilog;
+﻿using Microsoft.Recognizers.Text;
+using Microsoft.Recognizers.Text.DateTime;
+using Serilog;
 
 namespace PiSlicedDayPhotos.Utility;
 
 public static class PhotographTimeTools
 {
+    public static List<CustomTimeAndSettingsTranslated> GetCustomTimes(List<CustomTimeAndSettings> customTimes,
+        DateTime sunrise, DateTime sunset)
+    {
+        var returnList = new List<CustomTimeAndSettingsTranslated>();
+
+        foreach (var loopCustomTime in customTimes)
+        {
+            if(string.IsNullOrWhiteSpace(loopCustomTime.Time)) continue;
+
+            if (loopCustomTime.Time.Contains("Sunrise", StringComparison.OrdinalIgnoreCase))
+            {
+                var isMinus = loopCustomTime.Time.Contains("-", StringComparison.OrdinalIgnoreCase);
+                var minutesString = loopCustomTime.Time
+                    .Replace("-", string.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace("+", string.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace("Sunrise", string.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace("minutes", String.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace("min", String.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace("m", String.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Trim();
+                
+                if(string.IsNullOrWhiteSpace(minutesString)) throw new Exception($"The Custom Time {loopCustomTime} could not be parsed - no number of minutes +/- Sunrise were found.");
+
+                if(!int.TryParse(minutesString, out var minutes)) throw new Exception($"The Custom Time {loopCustomTime} could not be parsed - the number of minutes +/- Sunrise could not be parsed as an integer.");
+
+                if (minutes == 0)
+                    throw new Exception(
+                        $"The Custom Time {loopCustomTime} is not valid - the number of minutes +/- Sunrise must not be zero.");
+
+                if (minutes >= 1440)
+                    throw new Exception(
+                        $"The Custom Time {loopCustomTime} is not valid - the number of minutes +/- Sunrise must be less than 1440 (less than one day).");
+
+                returnList.Add(new CustomTimeAndSettingsTranslated { Time = isMinus ? sunrise.AddMinutes(-minutes) : sunrise.AddMinutes(minutes), Settings = loopCustomTime.Settings });
+
+                continue;
+            }
+
+            if (loopCustomTime.Time.Contains("Sunset", StringComparison.OrdinalIgnoreCase))
+            {
+                var isMinus = loopCustomTime.Time.Contains("-", StringComparison.OrdinalIgnoreCase);
+                var minutesString = loopCustomTime.Time
+                    .Replace("-", string.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace("+", string.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace("Sunset", string.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace("minutes", String.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace("min", String.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace("m", String.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Trim();
+
+                if (string.IsNullOrWhiteSpace(minutesString)) throw new Exception($"The Custom Time {loopCustomTime} could not be parsed - no number of minutes +/- Sunset were found.");
+
+                if (!int.TryParse(minutesString, out var minutes)) throw new Exception($"The Custom Time {loopCustomTime} could not be parsed - the number of minutes +/- Sunset could not be parsed as an integer.");
+
+                if (minutes == 0)
+                    throw new Exception(
+                        $"The Custom Time {loopCustomTime} is not valid - the number of minutes +/- Sunset must not be zero.");
+
+                if (minutes >= 1440)
+                    throw new Exception(
+                        $"The Custom Time {loopCustomTime} is not valid - the number of minutes +/- Sunset must be less than 1440 (less than one day).");
+
+                returnList.Add(new CustomTimeAndSettingsTranslated { Time = isMinus ? sunset.AddMinutes(-minutes) : sunset.AddMinutes(minutes), Settings = loopCustomTime.Settings });
+                continue;
+            }
+
+            var timeParseResults = DateTimeRecognizer.RecognizeDateTime(loopCustomTime.Time, Culture.English);
+
+            if (timeParseResults.Count == 0 || timeParseResults[0].Resolution.Count == 0 || timeParseResults.All(x => x.TypeName != "datetimeV2.time")) throw new Exception($"The Custom Time {loopCustomTime} could not be parsed.");
+
+            var valuesFound = timeParseResults.First(x => x.TypeName == "datetimeV2.time").Resolution.TryGetValue("values", out var valuesObject);
+            if (!valuesFound || valuesObject is not List<Dictionary<string, string>> valuesDictionary ||
+                valuesDictionary.Count < 1 ||
+                !valuesDictionary[0].TryGetValue("value", out var customTimeRecognized) ||
+                !TimeOnly.TryParse(customTimeRecognized, out var customTimeParsed))
+            {
+                throw new Exception($"The Custom Time {loopCustomTime} could not be parsed.");
+                continue;
+            }
+
+            returnList.Add(new CustomTimeAndSettingsTranslated { Time = sunrise.Date.Add(customTimeParsed.ToTimeSpan()), Settings = loopCustomTime.Settings });
+        }
+
+        return returnList;
+    }
+
     public static ScheduledPhoto PhotographTime(DateTime referenceDateTime,
         List<SunriseSunsetEntry> allSunriseSunsetEntries,
         int dayDivisions,
@@ -15,9 +103,6 @@ public static class PhotographTimeTools
 
         var sunriseSunsetEntries = allSunriseSunsetEntries.Where(x =>
             x.ReferenceDate >= startSunriseSunsetSearch && x.ReferenceDate <= endSunriseSunsetSearch).ToList();
-
-        var resultTextView = string.Join(Environment.NewLine, sunriseSunsetEntries.Select(x =>
-            $"   Reference Date {x.ReferenceDate.ToShortOutput()}, Local Sunrise {x.LocalSunrise.ToShortOutput()}, Local Sunset {x.LocalSunset.ToShortOutput()}"));
 
         var pastSunrise = sunriseSunsetEntries.Where(x => x.LocalSunrise < referenceDateTime)
             .MinBy(x => referenceDateTime.Subtract(x.LocalSunrise))!.LocalSunrise;
