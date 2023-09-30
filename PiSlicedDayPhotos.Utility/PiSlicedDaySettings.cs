@@ -13,5 +13,5 @@ public class PiSlicedDaySettings
     public string PhotoNamePrefix { get; set; } = string.Empty;
     public string PhotoStorageDirectory { get; set; } = string.Empty;
     public string SunriseSunsetCsvFile { get; set; } = string.Empty;
-    public List<CustomTimeAndSettings> CustomTimes { get; set; }
+    public List<CustomTimeAndSettings> CustomTimes { get; set; } = new();
 }

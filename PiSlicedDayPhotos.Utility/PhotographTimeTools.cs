@@ -13,7 +13,7 @@ public static class PhotographTimeTools
 
         foreach (var loopCustomTime in customTimes)
         {
-            if(string.IsNullOrWhiteSpace(loopCustomTime.Time)) continue;
+            if (string.IsNullOrWhiteSpace(loopCustomTime.Time)) continue;
 
             if (loopCustomTime.Time.Contains("Sunrise", StringComparison.OrdinalIgnoreCase))
             {
@@ -22,14 +22,18 @@ public static class PhotographTimeTools
                     .Replace("-", string.Empty, StringComparison.OrdinalIgnoreCase)
                     .Replace("+", string.Empty, StringComparison.OrdinalIgnoreCase)
                     .Replace("Sunrise", string.Empty, StringComparison.OrdinalIgnoreCase)
-                    .Replace("minutes", String.Empty, StringComparison.OrdinalIgnoreCase)
-                    .Replace("min", String.Empty, StringComparison.OrdinalIgnoreCase)
-                    .Replace("m", String.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace("minutes", string.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace("min", string.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace("m", string.Empty, StringComparison.OrdinalIgnoreCase)
                     .Trim();
-                
-                if(string.IsNullOrWhiteSpace(minutesString)) throw new Exception($"The Custom Time {loopCustomTime} could not be parsed - no number of minutes +/- Sunrise were found.");
 
-                if(!int.TryParse(minutesString, out var minutes)) throw new Exception($"The Custom Time {loopCustomTime} could not be parsed - the number of minutes +/- Sunrise could not be parsed as an integer.");
+                if (string.IsNullOrWhiteSpace(minutesString))
+                    throw new Exception(
+                        $"The Custom Time {loopCustomTime} could not be parsed - no number of minutes +/- Sunrise were found.");
+
+                if (!int.TryParse(minutesString, out var minutes))
+                    throw new Exception(
+                        $"The Custom Time {loopCustomTime} could not be parsed - the number of minutes +/- Sunrise could not be parsed as an integer.");
 
                 if (minutes == 0)
                     throw new Exception(
@@ -39,7 +43,11 @@ public static class PhotographTimeTools
                     throw new Exception(
                         $"The Custom Time {loopCustomTime} is not valid - the number of minutes +/- Sunrise must be less than 1440 (less than one day).");
 
-                returnList.Add(new CustomTimeAndSettingsTranslated { Time = isMinus ? sunrise.AddMinutes(-minutes) : sunrise.AddMinutes(minutes), Settings = loopCustomTime.Settings });
+                returnList.Add(new CustomTimeAndSettingsTranslated
+                {
+                    Time = isMinus ? sunrise.AddMinutes(-minutes) : sunrise.AddMinutes(minutes),
+                    LibCameraParameters = loopCustomTime.LibCameraParameters
+                });
 
                 continue;
             }
@@ -51,14 +59,18 @@ public static class PhotographTimeTools
                     .Replace("-", string.Empty, StringComparison.OrdinalIgnoreCase)
                     .Replace("+", string.Empty, StringComparison.OrdinalIgnoreCase)
                     .Replace("Sunset", string.Empty, StringComparison.OrdinalIgnoreCase)
-                    .Replace("minutes", String.Empty, StringComparison.OrdinalIgnoreCase)
-                    .Replace("min", String.Empty, StringComparison.OrdinalIgnoreCase)
-                    .Replace("m", String.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace("minutes", string.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace("min", string.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace("m", string.Empty, StringComparison.OrdinalIgnoreCase)
                     .Trim();
 
-                if (string.IsNullOrWhiteSpace(minutesString)) throw new Exception($"The Custom Time {loopCustomTime} could not be parsed - no number of minutes +/- Sunset were found.");
+                if (string.IsNullOrWhiteSpace(minutesString))
+                    throw new Exception(
+                        $"The Custom Time {loopCustomTime} could not be parsed - no number of minutes +/- Sunset were found.");
 
-                if (!int.TryParse(minutesString, out var minutes)) throw new Exception($"The Custom Time {loopCustomTime} could not be parsed - the number of minutes +/- Sunset could not be parsed as an integer.");
+                if (!int.TryParse(minutesString, out var minutes))
+                    throw new Exception(
+                        $"The Custom Time {loopCustomTime} could not be parsed - the number of minutes +/- Sunset could not be parsed as an integer.");
 
                 if (minutes == 0)
                     throw new Exception(
@@ -68,34 +80,52 @@ public static class PhotographTimeTools
                     throw new Exception(
                         $"The Custom Time {loopCustomTime} is not valid - the number of minutes +/- Sunset must be less than 1440 (less than one day).");
 
-                returnList.Add(new CustomTimeAndSettingsTranslated { Time = isMinus ? sunset.AddMinutes(-minutes) : sunset.AddMinutes(minutes), Settings = loopCustomTime.Settings });
+                returnList.Add(new CustomTimeAndSettingsTranslated
+                {
+                    Time = isMinus ? sunset.AddMinutes(-minutes) : sunset.AddMinutes(minutes),
+                    LibCameraParameters = loopCustomTime.LibCameraParameters
+                });
                 continue;
             }
 
             var timeParseResults = DateTimeRecognizer.RecognizeDateTime(loopCustomTime.Time, Culture.English);
 
-            if (timeParseResults.Count == 0 || timeParseResults[0].Resolution.Count == 0 || timeParseResults.All(x => x.TypeName != "datetimeV2.time")) throw new Exception($"The Custom Time {loopCustomTime} could not be parsed.");
+            if (timeParseResults.Count == 0 || timeParseResults[0].Resolution.Count == 0 ||
+                timeParseResults.All(x => x.TypeName != "datetimeV2.time"))
+                throw new Exception($"The Custom Time {loopCustomTime} could not be parsed.");
 
-            var valuesFound = timeParseResults.First(x => x.TypeName == "datetimeV2.time").Resolution.TryGetValue("values", out var valuesObject);
+            var valuesFound = timeParseResults.First(x => x.TypeName == "datetimeV2.time").Resolution
+                .TryGetValue("values", out var valuesObject);
             if (!valuesFound || valuesObject is not List<Dictionary<string, string>> valuesDictionary ||
                 valuesDictionary.Count < 1 ||
                 !valuesDictionary[0].TryGetValue("value", out var customTimeRecognized) ||
                 !TimeOnly.TryParse(customTimeRecognized, out var customTimeParsed))
             {
                 throw new Exception($"The Custom Time {loopCustomTime} could not be parsed.");
-                continue;
             }
 
-            returnList.Add(new CustomTimeAndSettingsTranslated { Time = sunrise.Date.Add(customTimeParsed.ToTimeSpan()), Settings = loopCustomTime.Settings });
+            returnList.Add(new CustomTimeAndSettingsTranslated
+                { Time = sunrise.Date.Add(customTimeParsed.ToTimeSpan()), LibCameraParameters = loopCustomTime.LibCameraParameters });
         }
 
         return returnList;
     }
 
+    public static string LibcameraParametersFromKind(this PiSlicedDaySettings settings, PhotoKind kind)
+    {
+        return kind switch
+        {
+            PhotoKind.Day => settings.LibCameraParametersDay,
+            PhotoKind.Night => settings.LibCameraParametersNight,
+            PhotoKind.Sunrise => settings.LibCameraParametersSunrise,
+            PhotoKind.Sunset => settings.LibCameraParametersSunset,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
+
     public static ScheduledPhoto PhotographTime(DateTime referenceDateTime,
         List<SunriseSunsetEntry> allSunriseSunsetEntries,
-        int dayDivisions,
-        int nightDivisions)
+        PiSlicedDaySettings settings)
     {
         Console.WriteLine("Starting Next Photo Time Search");
         var startSunriseSunsetSearch = DateOnly.FromDateTime(referenceDateTime.Date.AddDays(-1));
@@ -120,53 +150,86 @@ public static class PhotographTimeTools
             $"Is Nighttime {nightTime} - Past Sunrise: {pastSunrise.ToShortOutput()} Past Sunset: {pastSunset.ToShortOutput()} -- Next Sunrise: {nextSunrise.ToShortOutput()} Next Sunset: {nextSunset.ToShortOutput()}",
             nightTime, pastSunrise, pastSunset, nextSunrise, nextSunset);
 
+        //Custom Times may be up to one day - so we need to check the previous day and next day in addition to today
+        var sunriseSunsetYesterday =
+            sunriseSunsetEntries.Single(x => x.ReferenceDate == DateOnly.FromDateTime(referenceDateTime.AddDays(-1)));
+        var sunriseSunsetToday =
+            sunriseSunsetEntries.Single(x => x.ReferenceDate == DateOnly.FromDateTime(referenceDateTime));
+        var sunriseSunsetTomorrow =
+            sunriseSunsetEntries.Single(x => x.ReferenceDate == DateOnly.FromDateTime(referenceDateTime.AddDays(1)));
+
+        var customTimes =
+            GetCustomTimes(settings.CustomTimes, sunriseSunsetYesterday.LocalSunrise,
+                    sunriseSunsetYesterday.LocalSunset)
+                .Concat(GetCustomTimes(settings.CustomTimes, sunriseSunsetToday.LocalSunrise,
+                    sunriseSunsetToday.LocalSunset))
+                .Concat(GetCustomTimes(settings.CustomTimes, sunriseSunsetTomorrow.LocalSunrise,
+                    sunriseSunsetTomorrow.LocalSunset)).Select(x => new ScheduledPhoto
+                    { Kind = PhotoKind.Custom, ScheduledTime = x.Time, LibCameraParameters = x.LibCameraParameters })
+                .OrderBy(x => x.ScheduledTime).ToList();
+
         if (nightTime)
         {
             var nightLength = nextSunrise.Subtract(pastSunset);
-            var nightInterval = TimeSpan.FromSeconds(nightLength.TotalSeconds / (nightDivisions + 1));
+            var nightInterval = TimeSpan.FromSeconds(nightLength.TotalSeconds / (settings.NightSlices + 1));
 
             Console.WriteLine($"Night: Night Length: {nightLength:c} - Night Interval {nightInterval:c}");
 
-            for (var i = 1; i <= nightDivisions; i++)
-            {
-                var nextIntervalTime = pastSunset.AddSeconds(nightInterval.TotalSeconds * i);
+            var nightIntervalEntries = new List<ScheduledPhoto>();
 
-                if (referenceDateTime < nextIntervalTime)
+            for (var i = 1; i <= settings.NightSlices; i++)
+                nightIntervalEntries.Add(new ScheduledPhoto
                 {
-                    Console.WriteLine($" Returning {nextIntervalTime.ToShortOutput()} as next Photograph Time");
-                    return new ScheduledPhoto { Kind = PhotoKind.Night, ScheduledTime = nextIntervalTime };
-                }
-            }
+                    Kind = PhotoKind.Night, ScheduledTime = pastSunset.AddSeconds(nightInterval.TotalSeconds * i),
+                    LibCameraParameters = settings.LibcameraParametersFromKind(PhotoKind.Night)
+                });
 
-            Console.WriteLine($"Returning Next Sunrise - {nextSunrise.ToShortOutput()} - as next Photograph Time");
+            nightIntervalEntries.Add(new ScheduledPhoto
+            {
+                Kind = PhotoKind.Sunrise, ScheduledTime = nextSunrise,
+                LibCameraParameters = settings.LibcameraParametersFromKind(PhotoKind.Sunrise)
+            });
 
-            return new ScheduledPhoto { Kind = PhotoKind.Sunrise, ScheduledTime = nextSunrise };
+            var selectedNightEntry = nightIntervalEntries.Concat(customTimes).Where(x => x.ScheduledTime > referenceDateTime)
+                .MinBy(x => x.ScheduledTime - referenceDateTime)!;
+
+            Console.WriteLine(
+                $"Returning - {selectedNightEntry.ScheduledTime.ToShortOutput()}, {selectedNightEntry.Kind}, {selectedNightEntry.LibCameraParameters} - as next Photograph Time");
+
+            return selectedNightEntry;
         }
 
         var dayLength = nextSunset.Subtract(pastSunrise);
-        var dayInterval = TimeSpan.FromSeconds(dayLength.TotalSeconds / (dayDivisions + 1));
+        var dayInterval = TimeSpan.FromSeconds(dayLength.TotalSeconds / (settings.DaySlices + 1));
 
         Console.WriteLine($"Day: Day Length: {dayLength:c} - Day Interval {dayInterval:c}");
 
-        for (var i = 1; i <= dayDivisions; i++)
-        {
-            var nextIntervalTime = pastSunrise.AddSeconds(dayInterval.TotalSeconds * i);
+        var dayIntervalEntries = new List<ScheduledPhoto>();
 
-            if (referenceDateTime < nextIntervalTime)
+        for (var i = 1; i <= settings.DaySlices; i++)
+            dayIntervalEntries.Add(new ScheduledPhoto
             {
-                Console.WriteLine($" Returning {nextIntervalTime.ToShortOutput()} as next Photograph Time");
-                return new ScheduledPhoto { Kind = PhotoKind.Day, ScheduledTime = nextIntervalTime };
-            }
-        }
+                Kind = PhotoKind.Day, ScheduledTime = pastSunrise.AddSeconds(dayInterval.TotalSeconds * i),
+                LibCameraParameters = settings.LibcameraParametersFromKind(PhotoKind.Day)
+            });
 
-        Console.WriteLine($"Returning Next Sunset - {nextSunset.ToShortOutput()} - as next Photograph Time");
+        dayIntervalEntries.Add(new ScheduledPhoto
+        {
+            Kind = PhotoKind.Sunset, ScheduledTime = nextSunset,
+            LibCameraParameters = settings.LibcameraParametersFromKind(PhotoKind.Sunset)
+        });
 
-        return new ScheduledPhoto { Kind = PhotoKind.Sunset, ScheduledTime = nextSunset };
+        var selectedDayEntry = dayIntervalEntries.Concat(customTimes).Where(x => x.ScheduledTime > referenceDateTime)
+            .MinBy(x => x.ScheduledTime - referenceDateTime)!;
+
+        Console.WriteLine(
+            $"Returning - {selectedDayEntry.ScheduledTime.ToShortOutput()}, {selectedDayEntry.Kind}, {selectedDayEntry.LibCameraParameters} - as next Photograph Time");
+
+        return selectedDayEntry;
     }
 
     public static ScheduledPhoto PhotographTimeFromFile(DateTime referenceDateTime, string sunriseSunsetFileName,
-        int dayDivisions,
-        int nightDivisions)
+        PiSlicedDaySettings settings)
     {
         Console.WriteLine("Starting Next Photo Time Search");
         var startSunriseSunsetSearch = DateOnly.FromDateTime(referenceDateTime.Date.AddDays(-1));
@@ -176,12 +239,11 @@ public static class PhotographTimeTools
             SunriseSunsetsFromFile(sunriseSunsetFileName, startSunriseSunsetSearch, endSunriseSunsetSearch)
                 .OrderBy(x => x.ReferenceDate).ToList();
 
-        return PhotographTime(referenceDateTime, sunriseSunsetEntries, dayDivisions, nightDivisions);
+        return PhotographTime(referenceDateTime, sunriseSunsetEntries, settings);
     }
 
     public static ScheduledPhoto PhotographTimeFromString(DateTime referenceDateTime, string sunriseSunsetString,
-        int dayDivisions,
-        int nightDivisions)
+        PiSlicedDaySettings settings)
     {
         Console.WriteLine("Starting Next Photo Time Search");
         var startSunriseSunsetSearch = DateOnly.FromDateTime(referenceDateTime.Date.AddDays(-1));
@@ -191,20 +253,19 @@ public static class PhotographTimeTools
             SunriseSunsetsFromString(sunriseSunsetString, startSunriseSunsetSearch, endSunriseSunsetSearch)
                 .OrderBy(x => x.ReferenceDate).ToList();
 
-        return PhotographTime(referenceDateTime, sunriseSunsetEntries, dayDivisions, nightDivisions);
+        return PhotographTime(referenceDateTime, sunriseSunsetEntries, settings);
     }
 
     public static List<ScheduledPhoto> PhotographTimeSchedule(int days, DateTime startDateTime,
         List<SunriseSunsetEntry> sunriseSunsetEntries,
-        int dayDivisions, int nightDivisions)
+        PiSlicedDaySettings settings)
     {
         var endDateTime = startDateTime.AddDays(days);
-
 
         var returnList = new List<ScheduledPhoto>();
 
         var nextPhotographTime =
-            PhotographTime(startDateTime, sunriseSunsetEntries, dayDivisions, nightDivisions);
+            PhotographTime(startDateTime, sunriseSunsetEntries, settings);
 
         if (nextPhotographTime.ScheduledTime > endDateTime)
             return returnList;
@@ -214,8 +275,7 @@ public static class PhotographTimeTools
         do
         {
             nextPhotographTime = PhotographTime(nextPhotographTime.ScheduledTime.AddSeconds(1), sunriseSunsetEntries,
-                dayDivisions,
-                nightDivisions);
+                settings);
             if (nextPhotographTime.ScheduledTime <= endDateTime) returnList.Add(nextPhotographTime);
         } while (nextPhotographTime.ScheduledTime <= endDateTime);
 
@@ -224,20 +284,20 @@ public static class PhotographTimeTools
 
     public static List<ScheduledPhoto> PhotographTimeScheduleFromFile(int days, DateTime startDateTime,
         string sunriseSunsetFileName,
-        int dayDivisions, int nightDivisions)
+        PiSlicedDaySettings settings)
     {
         var entries = SunriseSunsetsFromFile(sunriseSunsetFileName, DateOnly.MinValue, DateOnly.MaxValue).ToList();
 
-        return PhotographTimeSchedule(days, startDateTime, entries, dayDivisions, nightDivisions);
+        return PhotographTimeSchedule(days, startDateTime, entries, settings);
     }
 
     public static List<ScheduledPhoto> PhotographTimeScheduleFromString(int days, DateTime startDateTime,
         string sunriseSunsetString,
-        int dayDivisions, int nightDivisions)
+        PiSlicedDaySettings settings)
     {
         var entries = SunriseSunsetsFromString(sunriseSunsetString, DateOnly.MinValue, DateOnly.MaxValue).ToList();
 
-        return PhotographTimeSchedule(days, startDateTime, entries, dayDivisions, nightDivisions);
+        return PhotographTimeSchedule(days, startDateTime, entries, settings);
     }
 
     public static List<SunriseSunsetEntry> SunriseSunsetsFromFile(string sunriseSunsetFileName, DateOnly startDate,

@@ -8,4 +8,6 @@ public class ScheduledPhoto
 {
     public PhotoKind Kind { get; init; }
     public DateTime ScheduledTime { get; init; }
+
+    public string LibCameraParameters { get; init; } = string.Empty;
 }

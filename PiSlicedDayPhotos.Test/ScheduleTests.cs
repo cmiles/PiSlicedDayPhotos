@@ -42,12 +42,72 @@ public class ScheduleTests
         """;
 
     [Test]
+    public void NextPhotoTimesWithOneDivisionAndCustomPreSunrisePostSunset()
+    {
+        var entries = PhotographTimeTools
+            .SunriseSunsetsFromString(SunriseSunsetLines, DateOnly.MinValue, DateOnly.MaxValue).ToList();
+
+        var newSettings = new PiSlicedDaySettings()
+        {
+            DaySlices = 1,
+            NightSlices = 1,
+            CustomTimes =
+            {
+                new CustomTimeAndSettings { LibCameraParameters = "Pre Sunrise", Time = "Sunrise-10m" },
+                new CustomTimeAndSettings { LibCameraParameters = "Post Sunset", Time = "Sunset+10m" }
+            }
+        };
+
+        var schedule = PhotographTimeTools.PhotographTimeSchedule(2, new DateTime(2023, 1, 22), entries, newSettings);
+
+        var expectedStringResults = """
+                                    1/22/2023 12:56:00 AM
+                                    1/22/2023 8:03:00 AM
+                                    1/22/2023 8:13:00 AM
+                                    1/22/2023 12:56:30 PM
+                                    1/22/2023 5:40:00 PM
+                                    1/22/2023 5:50:00 PM
+                                    1/23/2023 12:56:00 AM
+                                    1/23/2023 8:02:00 AM
+                                    1/23/2023 8:12:00 AM
+                                    1/23/2023 12:56:30 PM
+                                    1/23/2023 5:41:00 PM
+                                    1/23/2023 5:51:00 PM
+                                    """;
+
+        var expectedDateTimeResults = expectedStringResults
+            .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
+            .Select(DateTime.Parse).ToList();
+
+        Assert.That(schedule.Count, Is.EqualTo(12));
+        Assert.That(schedule.Select(x => x.ScheduledTime).ToList(), Is.EquivalentTo(expectedDateTimeResults));
+        Assert.That(schedule[0].Kind, Is.EqualTo(PhotoKind.Night));
+        Assert.That(schedule[1].Kind, Is.EqualTo(PhotoKind.Custom));
+        Assert.That(schedule[2].Kind, Is.EqualTo(PhotoKind.Sunrise));
+        Assert.That(schedule[3].Kind, Is.EqualTo(PhotoKind.Day));
+        Assert.That(schedule[4].Kind, Is.EqualTo(PhotoKind.Sunset));
+        Assert.That(schedule[5].Kind, Is.EqualTo(PhotoKind.Custom));
+        Assert.That(schedule[6].Kind, Is.EqualTo(PhotoKind.Night));
+        Assert.That(schedule[7].Kind, Is.EqualTo(PhotoKind.Custom));
+        Assert.That(schedule[8].Kind, Is.EqualTo(PhotoKind.Sunrise));
+        Assert.That(schedule[9].Kind, Is.EqualTo(PhotoKind.Day));
+        Assert.That(schedule[10].Kind, Is.EqualTo(PhotoKind.Sunset));
+        Assert.That(schedule[11].Kind, Is.EqualTo(PhotoKind.Custom));
+    }
+
+    [Test]
     public void NextPhotoTimesWithOneDivisions()
     {
         var entries = PhotographTimeTools
             .SunriseSunsetsFromString(SunriseSunsetLines, DateOnly.MinValue, DateOnly.MaxValue).ToList();
 
-        var schedule = PhotographTimeTools.PhotographTimeSchedule(2, new DateTime(2023, 1, 22), entries, 1, 1);
+        var newSettings = new PiSlicedDaySettings()
+        {
+            DaySlices = 1,
+            NightSlices = 1
+        };
+
+        var schedule = PhotographTimeTools.PhotographTimeSchedule(2, new DateTime(2023, 1, 22), entries, newSettings);
 
         var expectedStringResults = """
                                     1/22/2023 12:56:00 AM
@@ -82,7 +142,9 @@ public class ScheduleTests
         var entries = PhotographTimeTools
             .SunriseSunsetsFromString(SunriseSunsetLines, DateOnly.MinValue, DateOnly.MaxValue).ToList();
 
-        var schedule = PhotographTimeTools.PhotographTimeSchedule(6, new DateTime(2023, 1, 22), entries, 0, 0);
+        var newSettings = new PiSlicedDaySettings();
+
+        var schedule = PhotographTimeTools.PhotographTimeSchedule(6, new DateTime(2023, 1, 22), entries, newSettings);
 
         Assert.That(schedule.Count, Is.EqualTo(12));
         Assert.That(schedule.First().ScheduledTime, Is.EqualTo(DateTime.Parse("1/22/2023 08:13:00-0700")));

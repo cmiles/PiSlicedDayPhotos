@@ -175,8 +175,7 @@ public class PhotoWorker : BackgroundService
             if (newSettings == null) settings = newSettings;
 
             _nextTime = PhotographTimeTools.PhotographTimeFromFile(DateTime.Now, settings!.SunriseSunsetCsvFile,
-                settings.DaySlices,
-                settings.NightSlices);
+                settings);
 
             Log.Information("[Timing] Next Photograph Time Set {@NextTime}", _nextTime);
 
@@ -185,8 +184,7 @@ public class PhotoWorker : BackgroundService
                 var upcomingSchedule = PhotographTimeTools.PhotographTimeScheduleFromFile(2,
                     currentPhotoDateTime.ScheduledTime,
                     settings.SunriseSunsetCsvFile,
-                    settings.DaySlices,
-                    settings.NightSlices);
+                    settings);
 
                 var scheduleDayGroup = upcomingSchedule.GroupBy(x => x.ScheduledTime.Date).ToList();
 
@@ -206,15 +204,13 @@ public class PhotoWorker : BackgroundService
         }
 
         _nextTime = PhotographTimeTools.PhotographTimeFromFile(DateTime.Now, settings.SunriseSunsetCsvFile,
-            settings.DaySlices,
-            settings.NightSlices);
+            settings);
 
         Log.Information("[Timing] Next Photograph Time Set {@NextTime}", _nextTime);
 
         var upcomingSchedule = PhotographTimeTools.PhotographTimeScheduleFromFile(2, DateTime.Now,
             settings.SunriseSunsetCsvFile,
-            settings.DaySlices,
-            settings.NightSlices);
+            settings);
 
         var scheduleDayGroup = upcomingSchedule.GroupBy(x => x.ScheduledTime.Date).ToList();
 
@@ -241,8 +237,7 @@ public class PhotoWorker : BackgroundService
                 if (timeUntilNextPhoto.TotalMinutes <= -5)
                 {
                     var nextTime = PhotographTimeTools.PhotographTimeFromFile(DateTime.Now,
-                        settings.SunriseSunsetCsvFile, settings.DaySlices,
-                        settings.NightSlices);
+                        settings.SunriseSunsetCsvFile, settings);
 
                     Log.ForContext("hint",
                             "A past next photo time can result from errors in the main photo loop - there should be Log entries prior to this entry that help diagnose any problems.")
