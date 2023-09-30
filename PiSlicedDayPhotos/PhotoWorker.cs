@@ -96,17 +96,8 @@ public class PhotoWorker : BackgroundService
             var fileName = Path.Combine(settings.PhotoStorageDirectory,
                 $"{settings.PhotoNamePrefix}{(string.IsNullOrWhiteSpace(settings.PhotoNamePrefix) ? "" : "-")}{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.jpg");
 
-            var arguments = currentPhotoDateTime.Kind switch
-            {
-                PhotoKind.Day => settings.LibCameraParametersDay,
-                PhotoKind.Night => settings.LibCameraParametersNight,
-                PhotoKind.Sunrise => settings.LibCameraParametersSunrise,
-                PhotoKind.Sunset => settings.LibCameraParametersSunset,
-                _ => throw new ArgumentOutOfRangeException()
-            };
-
             var photoExecutable = "libcamera-still";
-            var photoArguments = $"-o {fileName} {arguments}".Trim();
+            var photoArguments = $"-o {fileName} {_nextTime.LibCameraParameters}".Trim();
 
             Log.Verbose($"Taking Photo at {DateTime.Now:O} - {photoExecutable} {photoArguments}");
 
@@ -193,14 +184,14 @@ public class PhotoWorker : BackgroundService
                         $"Schedule for {x.First().ScheduledTime:M/d}: {string.Join(", ", x.Select(y => y.ScheduledTime.ToString("h:mm tt")))}"));
             }
 
-            mainLoop!.Change(_nextTime.ScheduledTime.Subtract(DateTime.Now), Timeout.InfiniteTimeSpan);
+            mainLoop.Change(_nextTime.ScheduledTime.Subtract(DateTime.Now), Timeout.InfiniteTimeSpan);
 
             Console.WriteLine();
 
             //There could be a slightly awkward interaction with the timing change at the top of this method TO
             //delay the watch dog until after the photo run - but in general the assumption is that the delay
             //should be more than enough time to execute the photo taking process.
-            heartBeatWatchDogTimer!.Change(TimeSpan.Zero, TimeSpan.FromMinutes(1));
+            heartBeatWatchDogTimer.Change(TimeSpan.Zero, TimeSpan.FromMinutes(1));
         }
 
         _nextTime = PhotographTimeTools.PhotographTimeFromFile(DateTime.Now, settings.SunriseSunsetCsvFile,
@@ -222,7 +213,7 @@ public class PhotoWorker : BackgroundService
             _nextTime.ScheduledTime.Subtract(DateTime.Now),
             Timeout.InfiniteTimeSpan);
 
-        Console.WriteLine($"Next Scheduled Photo: {_nextTime:O} - {_nextTime.ScheduledTime.Subtract(DateTime.Now):g}");
+        Console.WriteLine($"Next Scheduled Photo: {_nextTime.ScheduledTime:O} - {_nextTime.ScheduledTime.Subtract(DateTime.Now):g}");
 
         heartBeatWatchDogTimer = new Timer((_) =>
             {
