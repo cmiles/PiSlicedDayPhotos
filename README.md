@@ -1,14 +1,14 @@
 ## Pi Sliced Day Photos
 
-This is a small program designed to be run on a Raspberry Pi that takes photographs at Sunrise, Sunset and at a number of specified intervals in-between.
+This is a small program designed to be run on a Raspberry Pi that takes photographs at Sunrise, Sunset, a number of specified intervals in-between and at custom times either specified by clock time or minutes +/- from sunrise/sunset.
 
-The in-between intervals are calculated from the sunrise/sunset times and will not be at the same clock time each day - instead they will be at the same %/relative time thru the day or night. Probably the best example of 'why' is wanting a photo at sunrise, half way thru the day light and at sunset...
+The in-between intervals are calculated from the sunrise/sunset times and will not necessarily be at the same clock time each day - instead they will be at the same %/relative time thru the day or night. For me, living below mountian peaks to the east, the amount of daylight/darkness at my house has become a frame for my life and makes more intuitive sense to me than clock time or absolute position of the sun, so a system that take a photograph 'half way thru the amount of the day when the sun is visible' is personally meaningful.
 
 For this program to work it requires:
  - A settings file named PiSlicedDaySettings.json - an example is included in the code
  - A CSV file named SunriseAndSunset.csv with the calendar day, sunrise time (local) and sunset time (local)
 
-In the settings file you can specify how many photographs you want taken between Sunrise and Sunset (during the day) and between Sunset and Sunrise (during the night) - zero is a valid setting. Sunrise and Sunset are always photographed.
+Sunrise and Sunset are always photographed. In the settings file you can specify how many photographs you want taken between Sunrise and Sunset (during the day - 0 is valid), between Sunset and Sunrise (during the night - 0 is valid) and specify custom times either as clock times or as Sunrise/Sunset +/- minutes.
 
 The reason this program uses a file of Sunrise/Sunset times is to allow you to input any sunrise/sunset times that you want - a strong use case for this is generating topography compensated Sunrise/Sunset times for your location. For example today at my home we didn't see the sun come over the mountains to the east until 40+ minutes after the sun rise time calculated without the mountains in the way...
 
@@ -24,9 +24,14 @@ For a number of years my wife and I used a previous project - [cmiles/PiDropLaps
 Recently we installed a 12V/200aH solar system near our parking area. The main purpose of this system is to power the rodent deterrent lights for our trucks - but it has more than enough power to also power a Pi for photo purposes!
 
 ### Equipment:
- - [Raspberry Pi 3 Model A+](https://www.raspberrypi.com/products/raspberry-pi-3-model-a-plus/) with [a case from Adafruit](https://www.adafruit.com/product/2359): This is about $32 USD plus shipping - I like both the $25 USD price of the 3 A+ and the selection of ports - more utility than the Zero 2 W and I wouldn't ever use all the ports on a 'full size' 3 or 4.
- - Wood and Plexiglass Enclosure: Hopefully weatherproof (enough)! Built with spare/scrap wood, left over plexiglass, bug screen sitting in a closet, caulk from working on floor transitions and the paint for the deck. The main feature is that I recycled existing materials for this! As you can see in the photos the carpentry is very basic and no details are included.
- - Solar: As mentioned above the solar system powering this setup wasn't designed primarily to run the Pi - for the sake of documenting the project the main components of the system are listed below. This is not a recommendation regarding anything below, I don't have enough experience to do that, and like most real world systems I had many constraints and goals that are not in line with 'build the world's best small solar system'. Details like wiring and fuses omitted.
+ - [Raspberry Pi 3 Model A+](https://www.raspberrypi.com/products/raspberry-pi-3-model-a-plus/) with [5V 2.5A Switching Power Supply with 20AWG MicroUSB Cable](https://www.adafruit.com/product/1995) and [a case from Adafruit](https://www.adafruit.com/product/2359): This is about $40 USD plus shipping - I like the $25 USD price, full sized HDMI port and slim profile compared to a full 3/4/5.
+ - [Raspberry Pi Camera Module 3 - 12MP 120 Degree Wide Angle Lens](https://www.adafruit.com/product/5658): I love photography - you can see some of my work over on [Pointless Waymarks](https://pointlesswaymarks.com/) - so considered a number of choices for this project but in the end the cost/convenience/size/performance of going with a $35 official camera module won out.
+ - Wood and Plexiglass Enclosure: Hopefully weatherproof (enough)! Built with spare/scrap wood, bug screen sitting in a closet, caulk from working on floor transitions and the paint for the deck. The main feature is that I recycled existing materials for this! As you can see in the photos the carpentry is very basic and no details are included. The challenge I found with making a simple enclosure was weatherproofing the camera exit from the enclosure:
+  - I tried using plexiglass for the entire front panel of the enclosure - but at least with the plexiglass I had the images were never sharp, I was using plexiglass left over from another (not camera oriented) projected. Different plexiglass may work better but I didn't want to dive into figuring out 'best optical quality plexiglass' (and didn't want glass for durability reasons) so moved on.
+  - To move to another strategy I mounted the camera on the front panel of the enclosure - here I made my next mistake and mounted the camera tightly to the front panel - this didn't work, if you mount the camera package tightly against something you can end up impacting focus and not being able to get good photographs... In the end both for focus and making sure the wide angle camera has a clear view I simple made a larger hole in the panel for the camera.
+  - Next I tried a plexiglass dome off of Amazon - this was great for part of the photograph but distorted the edges. It's possible that the distortion would go away if I mounted the camera farther into the dome, but I wasn't interested in that complication..
+  - And the solution that finally worked for me was using a camera lens UV filter and hot gluing it to the outside of the eclosure. I used an $8 [Tiffen 55mm UV Protector Filters](https://www.bhphotovideo.com/c/product/72714-REG/Tiffen_55UVP_55mm_UV_Protector.html) - it is easy to find smaller diameter filters but after some experiments with filters I already owned I liked this size because it was very easy to position it so that the edge of the filter didn't get into the photo.
+ - Solar: As mentioned above powering the system with solar was a goal - but it turns out that the solar system powering my setup wasn't designed primarily to run the Pi - for the sake of documenting the project the main components of the system are listed below. This system is massive overkill if you just want to run a few Pis, like most real world systems I had many constraints and goals that are not in line with 'build the world's best small solar system' and this is not a recommendation regarding anything below, I don't have enough experience to do that, but just to document what I am actually doing my equipment list is below (wiring and fuses omitted - btw if you are building a system of this size or larger for the first time be sure to look up wiring and fuses/breaker cost - it was much more than I guessed...).
 	- 3x [Newpowa 100W 12V Mono Compact Solar Panels](https://www.newpowa.com/new-100w-compact-12v-mono-solar-panel/)
 	- 2x [Ampere Time 12V 100Ah Lithium Batteries](https://www.amperetime.com/collections/ampere-time-12v-lithium-lifepo4-battery-series/products/ampere-time-12v-100ah-lithium-lifepo4-battery) - purchased used.
 	- [Victron Energy SmartSolar MPPT 100/20](https://www.victronenergy.com/solar-charge-controllers/smartsolar-mppt-75-10-75-15-100-15-100-20)
@@ -36,11 +41,11 @@ Recently we installed a 12V/200aH solar system near our parking area. The main p
 
 ### Setup Notes
 
-In the first version of my small wooden enclosure I tried to have the Pi take photographs thru a clear piece of plexiglass left over from another project (that was not focused on optical quality) - this did NOT work and in spite of playing with settings and trying both a Camera module 2 and 3 - I'm not currently sure if this is more related to the flatness or the optical quality of the plexiglass...
-
 If you've worked in years gone by with the Pi Camera and C# you might have found the very useful [techyian/MMALSharp: C# wrapper to Broadcom's MMAL with an API to the Raspberry Pi camera.](https://github.com/techyian/MMALSharp) - without choosing an older version of Raspberry Pi OS that library doesn't work - the Pi has moved on to [libcamera](https://libcamera.org/). I didn't find a C# wrapper for libcamera and since I didn't need to do anything other than write stills to the Pi's storage simply calling libcamera-still 'command line style' seemed to be the best option.
 
 I didn't find a single great place for libcamera-still documentation - frustrating until I figured out that (beyond 'getting started' content) running 'libcamera-still --help' was really the best starting spot.
+
+[How To Easily Disable Status LEDs On Raspberry Pi – RaspberryTips](https://raspberrytips.com/disable-leds-on-raspberry-pi/)
 
 ## Other Projects
 
