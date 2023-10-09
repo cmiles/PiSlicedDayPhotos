@@ -17,37 +17,41 @@ In the settings file you can specify how many photographs you want taken between
 
 You can also specify custom times in the settings file either as clock times or as Sunrise/Sunset +/- minutes.
 
+
 ### SunriseAndSunset.csv
 
 This program uses a file of Sunrise/Sunset times to allow you to input any sunrise/sunset times that you want - a strong use case for this is generating topography compensated Sunrise/Sunset times for your location. For example today at my home we didn't see the sun come over the mountains to the east until 40+ minutes after the sun rise time calculated without the topography of the mountains...
 
 The SunriseAndSunset.csv file should be formated like the the sample file included with the program:
+```
 DAY, SUNRISE, SUNSET
 2023-01-01,08:15:00-0700,17:23:00-0700
 2023-01-02,08:15:00-0700,17:24:00-0700
+```
 
 If you are interested in generating Topography compensated Sunrise/Sunset times for your location try:
   - [gvellut/tppss: Compute sunrise / sunset times taking into account local topography](https://github.com/gvellut/tppss) - this is a great free way to generate the times - it does take some setup, but like me you might find preparing the data for the program is an interesting learning project!
   - [Find Your Location and Compute Sunlight Conditions](https://www.suncurves.com/en/) - a paid service that will do this for you.
   - Various photography apps can calculate/show you this information but I'm not sure if any of them export yearly (or multi-year) data...
 
+
 ### Settings File
 
-**DaySlices** - Takes an integer and determines the number of photos taken between sunrise and sunset
+_DaySlices_ - Takes an integer and determines the number of photos taken between sunrise and sunset
 
-**NightSlices** - Takes an integer and determines the number of photos taken between sunset and sunrise
+_NightSlices_ - Takes an integer and determines the number of photos taken between sunset and sunrise
 
-**PhotoStorageDirectory** - the path to where the photos are written
+_PhotoStorageDirectory_ - the path to where the photos are written
 
-**SunriseSunsetCsvFile** - the name (including extension) of the csv file of Sunrise and Sunset times
+_SunriseSunsetCsvFile_ - the name (including extension) of the csv file of Sunrise and Sunset times
 
-**PhotoNamePrefix** - Prefix for the photo names, the date and time will follow the prefix and .jpg to create the filename. It is especially useful to change this if you have multiple cameras running
+_PhotoNamePrefix_ - Prefix for the photo names, the date and time will follow the prefix and .jpg to create the filename. It is especially useful to change this if you have multiple cameras running
 
-**LogFullExceptionsToImages** - The assumption is that this program will run largely unattended in the background and that most of the time the only thing you will see from the program is the photographs. The program will try to alert you of errors by writing exception information to an error file in the PhotoStorageDirectory. This setting determines whether the program writes all of the exception information or only an abbreviated message. This option exists because writing full exception information may leak information about your setup!
+_LogFullExceptionsToImages_ - The assumption is that this program will run largely unattended in the background and that most of the time the only thing you will see from the program is the photographs. The program will try to alert you of errors by writing exception information to an error file in the PhotoStorageDirectory. This setting determines whether the program writes all of the exception information or only an abbreviated message. This option exists because writing full exception information may leak information about your setup!
 
-**LibCameraParameters** - Day/Night/Sunset/Sunrise - command line parameters for libcamera-still
+_LibCameraParameters_ - Day/Night/Sunset/Sunrise - command line parameters for libcamera-still
 
-**CustomTimes** - custom times can be specified either as clock times (3:45 pm) or as minutes before/after sunset (sunset +10). Each custom time also gets LibCamera parameters.
+_CustomTimes_ - custom times can be specified either as clock times (3:45 pm) or as minutes before/after sunset (sunset +10). Each custom time also gets LibCamera parameters.
 
 ```
 "CustomTimes": [
@@ -62,11 +66,10 @@ If you are interested in generating Topography compensated Sunrise/Sunset times 
   ]
 ```
 
+
 ### Setup Notes
 
-Clone, build and publish this project.
-
-Suggested setup:
+Suggested setup: Clone, build and publish this project to a folder - then on the Pi:
  - In your home directory - make a directory for the program and the photos:
 	```
 	mkdir PiSlicedDayPhotos
@@ -92,11 +95,13 @@ I didn't find a single great place for libcamera-still documentation - frustrati
 
 [How To Easily Disable Status LEDs On RaspberryTips](https://raspberrytips.com/disable-leds-on-raspberry-pi/)
 
+
 ### Backstory
 
 For a number of years my wife and I used a previous (now-archived) project - [cmiles/PiDropLapse](https://github.com/cmiles/PiDropLapse/tree/main) - and a [Raspberry Pi 4 Model B](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/) to take periodic photographs and sensor readings to monitor an area inside our house. Since moving to a more rural property I have wanted to do a similar project but outside and solar powered - Raspberry Pi shortages, never quite finding an in-stock dedicated Pi solar setup that I loved and other house projects delayed that idea...
 
 Recently we installed a 12V/200aH solar system near our parking area. The main purpose of this system is to power the rodent deterrent lights for our trucks - but it has more than enough power to also power several Pis for photo purposes!
+
 
 ### My Setup with Notes
  - [Raspberry Pi 3 Model A+](https://www.raspberrypi.com/products/raspberry-pi-3-model-a-plus/), [5V 2.5A Switching Power Supply with 20AWG MicroUSB Cable](https://www.adafruit.com/product/1995), 32 GB MicroSD Card and [a case from Adafruit](https://www.adafruit.com/product/2359): This is about $60 USD plus shipping - I like the $25 USD price of the 3 A+, the full sized HDMI port and the slim profile.
@@ -119,6 +124,7 @@ Recently we installed a 12V/200aH solar system near our parking area. The main p
 ### Other Projects
 
 Fundamentally this project is just taking photographs with the Raspberry Pi which is not hard to do and you can find other great free projects and code to take stills, timelapses and more! One of my favorites is [GitHub - thomasjacquin's allsky: A Raspberry Pi operated Wireless Allsky Camera](https://github.com/thomasjacquin/allsky) - I hope to build on of these in the future...
+
 
 ### Tools and Libraries
 
