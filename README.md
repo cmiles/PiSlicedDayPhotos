@@ -90,7 +90,7 @@ If you've worked in years gone by with the Pi Camera and C# you might have found
 
 I didn't find a single great place for libcamera-still documentation - frustrating until I figured out that (beyond 'getting started' content) running 'libcamera-still --help' was really the best single source of information.
 
-[How To Easily Disable Status LEDs On Raspberry Pi  RaspberryTips](https://raspberrytips.com/disable-leds-on-raspberry-pi/)
+[How To Easily Disable Status LEDs On RaspberryTips](https://raspberrytips.com/disable-leds-on-raspberry-pi/)
 
 ### Backstory
 
@@ -99,9 +99,9 @@ For a number of years my wife and I used a previous (now-archived) project - [cm
 Recently we installed a 12V/200aH solar system near our parking area. The main purpose of this system is to power the rodent deterrent lights for our trucks - but it has more than enough power to also power several Pis for photo purposes!
 
 ### My Setup with Notes
- - [Raspberry Pi 3 Model A+](https://www.raspberrypi.com/products/raspberry-pi-3-model-a-plus/), [5V 2.5A Switching Power Supply with 20AWG MicroUSB Cable](https://www.adafruit.com/product/1995), 32 GB MicroSD Card and [a case from Adafruit](https://www.adafruit.com/product/2359): This is about $60 USD plus shipping - I like the $25 USD price of the 3 A+ and the full sized HDMI port and slim profile compared to a full 3/4/5 is a bonus.
+ - [Raspberry Pi 3 Model A+](https://www.raspberrypi.com/products/raspberry-pi-3-model-a-plus/), [5V 2.5A Switching Power Supply with 20AWG MicroUSB Cable](https://www.adafruit.com/product/1995), 32 GB MicroSD Card and [a case from Adafruit](https://www.adafruit.com/product/2359): This is about $60 USD plus shipping - I like the $25 USD price of the 3 A+, the full sized HDMI port and the slim profile.
  - [Raspberry Pi Camera Module 3 - 12MP 120 Degree Wide Angle Lens](https://www.adafruit.com/product/5658): I love photography - you can see some of my work over on [Pointless Waymarks](https://pointlesswaymarks.com/) - so considered a number of choices for this project but in the end the cost/convenience/size/performance of going with a $35 official camera module won out.
- - Wood Enclosure: Hopefully weatherproof (enough)! Built with spare/scrap wood, bug screen sitting in a closet and the paint for our deck. The main feature is that I recycled existing materials for this! As you can see in the photos the carpentry is very basic and no details are included. The challenge I found with making a simple enclosure was weatherproofing the camera exit from the enclosure:
+ - Wood Enclosure: Hopefully weatherproof (enough)! Built with spare/scrap wood, bug screen sitting in a closet and the paint for our deck. The main feature is that I recycled existing materials for this! As you can see in the photos the carpentry is very (very!) basic so no details are included. The challenge I found with making a simple enclosure was weatherproofing the hole for the camera lens:
   - I tried using plexiglass for the entire front panel of the enclosure - but at least with the plexiglass I had the images were never sharp. I was using plexiglass left over from another (not camera oriented) project and I didn't want to dive into figuring out 'best optical quality plexiglass' (and didn't want glass for durability reasons) so I moved on.
   - To move to another strategy I mounted the camera on the front panel of the enclosure - at first with the mistake of mounting the camera tightly to the front panel - this didn't work, if you mount the camera package tightly against something you can end up impacting focus... In the end both for focus and making sure the wide angle camera has a clear view I simple made a larger hole in the panel for the camera but that made it more important to find something to cover the hole for weatherproofing.
   - I tried a plexiglass dome off of Amazon to cover the exit hole for the camera - this was great for part of the photograph but distorted the edges. It's possible that the distortion would go away if I mounted the camera farther into the dome, but that added a complication to the design I wasn't interested in.
