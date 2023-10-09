@@ -163,7 +163,7 @@ public class PhotoWorker : BackgroundService
                     settings.LogFullExceptionsToImages);
             }
 
-            if (newSettings == null) settings = newSettings;
+            if (newSettings != null) settings = newSettings;
 
             _nextTime = PhotographTimeTools.PhotographTimeFromFile(DateTime.Now, settings!.SunriseSunsetCsvFile,
                 settings);
