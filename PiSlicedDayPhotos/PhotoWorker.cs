@@ -10,10 +10,10 @@ public class PhotoWorker : BackgroundService
     private ScheduledPhoto _nextTime = new()
         { Kind = PhotoKind.Day, ScheduledTime = new DateTime(2012, 1, 12, 12, 0, 0) };
 
-    private string ErrorImageFileName(PiSlicedDaySettings serSettings)
+    private string ErrorImageFileName(PiSlicedDaySettings userSettings)
     {
-        return Path.Combine(serSettings.PhotoStorageDirectory,
-            $"Error-{serSettings.PhotoNamePrefix}{(string.IsNullOrWhiteSpace(serSettings.PhotoNamePrefix) ? "" : "-")}{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.jpg");
+        return Path.Combine(userSettings.PhotoStorageDirectory,
+            $"Error-{DateTime.Now:yyyy-MM-dd-HH-mm-ss}{(string.IsNullOrWhiteSpace(userSettings.PhotoNamePostfix) ? "" : "-")}{userSettings.PhotoNamePostfix}.jpg");
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -94,7 +94,7 @@ public class PhotoWorker : BackgroundService
             var currentPhotoDateTime = _nextTime;
 
             var fileName = Path.Combine(settings.PhotoStorageDirectory,
-                $"{settings.PhotoNamePrefix}{(string.IsNullOrWhiteSpace(settings.PhotoNamePrefix) ? "" : "-")}{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.jpg");
+                $"{DateTime.Now:yyyy-MM-dd-HH-mm-ss}{(string.IsNullOrWhiteSpace(settings.PhotoNamePostfix) ? "" : "-")}{settings.PhotoNamePostfix}.jpg");
 
             var photoExecutable = "libcamera-still";
             var photoArguments = $"-o {fileName} {_nextTime.LibCameraParameters}".Trim();

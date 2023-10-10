@@ -3,7 +3,7 @@
   "NightSlices": 2,
   "PhotoStorageDirectory": "../SlicedPhotos",
   "SunriseSunsetCsvFile": "SunriseAndSunset.csv",
-  "PhotoNamePrefix": "Slice",
+  "PhotoNamePostfix": "Slice",
   "LogFullExceptionsToImages": true,
   "LibCameraParametersDay": "--autofocus-mode manual --lens-position 0 --awb auto --metering average --denoise cdn_hq",
   "LibCameraParametersNight": "--autofocus-mode manual --lens-position 0 --shutter 60000000 --awb auto --denoise cdn_hq",
