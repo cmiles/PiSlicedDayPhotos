@@ -89,11 +89,13 @@ Suggested setup: Clone, build and publish this project to a folder - then on the
 	journalctl -u pisliceddayphotos -f
 	```
 
+I like to disable the LEDs to make sure that the glass covering the lens opening won't pick up any light from the LEDS - [How To Easily Disable Status LEDs On RaspberryTips](https://raspberrytips.com/disable-leds-on-raspberry-pi/)
+
+My preference is for Automatic/Unattended Upgrades - do this long enough and something unexpected will break, but would rather stay up to date and have something break sooner rather than later. [Secure your Raspberry Pi by enabling automatic software updates – Sean Carney](https://www.seancarney.ca/2021/02/06/secure-your-raspberry-pi-by-enabling-automatic-software-updates/) and [UnattendedUpgrades - Debian Wiki](https://wiki.debian.org/UnattendedUpgrades)
+
 If you've worked in years gone by with the Pi Camera and C# you might have found the very useful [techyian/MMALSharp: C# wrapper to Broadcom's MMAL with an API to the Raspberry Pi camera.](https://github.com/techyian/MMALSharp) - without choosing an older version of Raspberry Pi OS that library no longer works - the Pi has moved on to [libcamera](https://libcamera.org/). I didn't find a C# wrapper for libcamera and since I didn't need to do anything other than write stills to the Pi's storage simply calling libcamera-still 'command line style' seemed to be the best option.
 
 I didn't find a single great place for libcamera-still documentation - frustrating until I figured out that (beyond 'getting started' content) running 'libcamera-still --help' was really the best single source of information.
-
-[How To Easily Disable Status LEDs On RaspberryTips](https://raspberrytips.com/disable-leds-on-raspberry-pi/)
 
 
 ### Backstory
