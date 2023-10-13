@@ -89,11 +89,13 @@ Suggested setup: Clone, build and publish this project to a folder - then on the
 	journalctl -u pisliceddayphotos -f
 	```
 
+I like to disable the LEDs to make sure that the glass covering the lens opening won't pick up any light from the LEDS - [How To Easily Disable Status LEDs On RaspberryTips](https://raspberrytips.com/disable-leds-on-raspberry-pi/)
+
+My preference is for Automatic/Unattended Upgrades - do this long enough and something unexpected will break, but would rather stay up to date and have something break sooner rather than later. [Secure your Raspberry Pi by enabling automatic software updates – Sean Carney](https://www.seancarney.ca/2021/02/06/secure-your-raspberry-pi-by-enabling-automatic-software-updates/) and [UnattendedUpgrades - Debian Wiki](https://wiki.debian.org/UnattendedUpgrades)
+
 If you've worked in years gone by with the Pi Camera and C# you might have found the very useful [techyian/MMALSharp: C# wrapper to Broadcom's MMAL with an API to the Raspberry Pi camera.](https://github.com/techyian/MMALSharp) - without choosing an older version of Raspberry Pi OS that library no longer works - the Pi has moved on to [libcamera](https://libcamera.org/). I didn't find a C# wrapper for libcamera and since I didn't need to do anything other than write stills to the Pi's storage simply calling libcamera-still 'command line style' seemed to be the best option.
 
 I didn't find a single great place for libcamera-still documentation - frustrating until I figured out that (beyond 'getting started' content) running 'libcamera-still --help' was really the best single source of information.
-
-[How To Easily Disable Status LEDs On RaspberryTips](https://raspberrytips.com/disable-leds-on-raspberry-pi/)
 
 
 ### Backstory
@@ -104,6 +106,7 @@ Recently we installed a 12V/200aH solar system near our parking area. The main p
 
 
 ### My Setup with Notes
+
  - [Raspberry Pi 3 Model A+](https://www.raspberrypi.com/products/raspberry-pi-3-model-a-plus/), [5V 2.5A Switching Power Supply with 20AWG MicroUSB Cable](https://www.adafruit.com/product/1995), 32 GB MicroSD Card and [a case from Adafruit](https://www.adafruit.com/product/2359): This is about $60 USD plus shipping - I like the $25 USD price of the 3 A+, the full sized HDMI port and the slim profile.
  - [Raspberry Pi Camera Module 3 - 12MP 120 Degree Wide Angle Lens](https://www.adafruit.com/product/5658): I love photography - you can see some of my work over on [Pointless Waymarks](https://pointlesswaymarks.com/) - so considered a number of choices for this project but in the end the cost/convenience/size/performance of going with a $35 official camera module won out.
  - Wood Enclosure: Hopefully weatherproof (enough)! Built with spare/scrap wood, bug screen sitting in a closet and the paint for our deck. The main feature is that I recycled existing materials for this! As you can see in the photos the carpentry is very (very!) basic so no details are included. The challenge I found with making a simple enclosure was weatherproofing the hole for the camera lens:
@@ -123,7 +126,7 @@ Recently we installed a 12V/200aH solar system near our parking area. The main p
 
 ### Other Projects
 
-Fundamentally this project is just taking photographs with the Raspberry Pi which is not hard to do and you can find other great free projects and code to take stills, timelapses and more! One of my favorites is [GitHub - thomasjacquin's allsky: A Raspberry Pi operated Wireless Allsky Camera](https://github.com/thomasjacquin/allsky) - I hope to build on of these in the future...
+Fundamentally this project is just taking photographs with the Raspberry Pi which is not hard to do and you can find other great free projects and code to take stills, timelapses and more! One of my favorites is [GitHub - thomasjacquin's allsky: A Raspberry Pi operated Wireless Allsky Camera](https://github.com/thomasjacquin/allsky) - I hope to build on of these in the future... Also see [Roll Your Own All-Sky, Raspberry Pi Camera - IEEE Spectrum](https://spectrum.ieee.org/all-sky-camera) and the [Hacker News discussion](https://news.ycombinator.com/item?id=37850485).
 
 
 ### Tools and Libraries
