@@ -13,7 +13,7 @@ public class PhotoWorker : BackgroundService
     private string ErrorImageFileName(PiSlicedDaySettings userSettings)
     {
         return Path.Combine(userSettings.PhotoStorageDirectory,
-            $"Error-{DateTime.Now:yyyy-MM-dd-HH-mm-ss}{(string.IsNullOrWhiteSpace(userSettings.PhotoNamePostfix) ? "" : "-")}{userSettings.PhotoNamePostfix}.jpg");
+            $"{DateTime.Now:yyyy-MM-dd-HH-mm-ss}-Error{(string.IsNullOrWhiteSpace(userSettings.PhotoNamePostfix) ? "" : "-")}{userSettings.PhotoNamePostfix}.jpg");
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -126,10 +126,13 @@ public class PhotoWorker : BackgroundService
                 process.BeginErrorReadLine();
                 await process.WaitForExitAsync(stoppingToken);
 
-                Log.ForContext("libcamera-output", string.Join(Environment.NewLine, photoDataList))
-                    .ForContext("settings", settings)
-                    .Information("[Photograph] Photograph Taken - {executable} {arguments}", photoExecutable,
-                        photoArguments);
+                if (process.ExitCode == 0)
+                    Log.ForContext("libcamera-output", string.Join(Environment.NewLine, photoDataList))
+                        .ForContext("settings", settings)
+                        .Information("[Photograph] Photograph Taken - {executable} {arguments}", photoExecutable,
+                            photoArguments);
+                else
+                    throw new Exception($"libcamera-still exited with code {process.ExitCode}");
             }
             catch (Exception e)
             {
@@ -165,7 +168,7 @@ public class PhotoWorker : BackgroundService
 
             if (newSettings != null) settings = newSettings;
 
-            _nextTime = PhotographTimeTools.PhotographTimeFromFile(DateTime.Now, settings!.SunriseSunsetCsvFile,
+            _nextTime = PhotographTimeTools.PhotographTimeFromFile(DateTime.Now, settings.SunriseSunsetCsvFile,
                 settings);
 
             Log.Information("[Timing] Next Photograph Time Set {@NextTime}", _nextTime);
@@ -213,7 +216,8 @@ public class PhotoWorker : BackgroundService
             _nextTime.ScheduledTime.Subtract(DateTime.Now),
             Timeout.InfiniteTimeSpan);
 
-        Console.WriteLine($"Next Scheduled Photo: {_nextTime.ScheduledTime:O} - {_nextTime.ScheduledTime.Subtract(DateTime.Now):g}");
+        Console.WriteLine(
+            $"Next Scheduled Photo: {_nextTime.ScheduledTime:O} - {_nextTime.ScheduledTime.Subtract(DateTime.Now):g}");
 
         heartBeatWatchDogTimer = new Timer((_) =>
             {
