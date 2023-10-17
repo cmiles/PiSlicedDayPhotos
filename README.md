@@ -17,7 +17,9 @@ In the settings file you can specify how many photographs you want taken between
 
 You can also specify custom times in the settings file either as clock times or as Sunrise/Sunset +/- minutes.
 
-![OutputExample](PiSlicedDayMedia\PiSlicedDayPhotos-CombinedExample.jpg "Images created with this program combined in Photoshop from 3 Raspberry Pi 3 A+ computers with Wide Angle Camera Module 3 cameras - the cameras face, approximately, west, north and east.")
+The image below was created in Photoshop by combining the output of this program from 3 Raspberry Pi 3 A+ computers with Wide Angle Camera Module 3 cameras - the cameras face, approximately, west, north and east
+
+![OutputExample](PiSlicedDayMedia/PiSlicedDayPhotos-CombinedExample.jpg "Images created with this program combined in Photoshop from 3 Raspberry Pi 3 A+ computers with Wide Angle Camera Module 3 cameras - the cameras face, approximately, west, north and east.")
 
 
 ### SunriseAndSunset.csv
@@ -106,8 +108,7 @@ For a number of years my wife and I used a previous (now-archived) project - [cm
 
 Recently we installed a 12V/200aH solar system near our parking area. The main purpose of this system is to power the rodent deterrent lights for our trucks - but it has more than enough power to also power several Pis for photo purposes!
 
-
-![EnclosureExample](PiSlicedDayMedia\PiSlicedDayPhotos-MostlyRecycledCameraEnclosure.jpg "The Pis I am currently housing are in simple enclosures built from spare/scrap wood, deck paint we already had and a Tiffen 55mm UV Protector Filter.")
+![EnclosureExample](PiSlicedDayMedia/PiSlicedDayPhotos-MostlyRecycledCameraEnclosure.jpg "The Pis I am currently housing are in simple enclosures built from spare/scrap wood, deck paint we already had and a Tiffen 55mm UV Protector Filter.")
 
 ### My Setup with Notes
 
