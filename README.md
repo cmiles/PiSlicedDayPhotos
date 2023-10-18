@@ -2,20 +2,18 @@
 
 This is a small .NET Core (C#) program designed to be run on a Raspberry Pi that takes photographs at Sunrise, Sunset, a number of specified intervals in-between and at custom times specified either by clock time or minutes +/- from sunrise/sunset.
 
-The in-between intervals are calculated based on sunrise/sunset times and will not necessarily be at the same clock time each day - instead they will be at the same  relative time thru the day or night.
-
-For me, living in the shadows of mountain peaks, the amount of daylight/darkness at my house has become a frame for my life. A system that takes a photograph 'half way thru the light for the day' is more interesting than a photo taken at a certain clock time or sun angle.
+The in-between intervals are calculated based on sunrise/sunset times provided as a CSV file. Since the provided sunrise/sunset times may take topography (or other factors) into account the photographs might not be at the same clock time/sun angle each day, but will be at the same relative time between sunrise/sunset. Living living in the shadow of a mountain peak inspired this setup, 'half way thru the available sunlight for the day' is more interesting to me than a photo taken at a certain clock time or sun angle.
 
 For this program to work it requires:
- - A Raspberry Pi where .NET Core can run and an attached camera that responds to libcamera-still. This program has only been confirmed to run on a Raspberry Pi 3 A+ with a Camera Module 3 Wide - but I believe any 2+ version Pis that can run current versions of the Raspberry Pi OS should work paired with any of the official Pi camera modules... 
- - A settings file named PiSlicedDaySettings.json - an example is included in the code
- - A CSV file named SunriseAndSunset.csv with the calendar day, sunrise time (local) and sunset time (local)
+ - A Raspberry Pi where .NET Core can run and an attached camera that responds to libcamera-still. This program has only been confirmed to run on a Raspberry Pi 3 A+ with a Camera Module 3 Wide - but I believe any 2+ version Pis with current versions of the Raspberry Pi OS should work with any of the official Pi camera modules... 
+ - A settings file named PiSlicedDaySettings.json - an example is included in the code and there are notes below
+ - A CSV file named SunriseAndSunset.csv with the calendar day, sunrise time (local) and sunset time (local).
 
-Sunrise and Sunset are always photographed.
-
-In the settings file you can specify how many photographs you want taken between Sunrise and Sunset (during the day - 0 is valid), between Sunset and Sunrise (during the night - 0 is valid).
-
-You can also specify custom times in the settings file either as clock times or as Sunrise/Sunset +/- minutes.
+Sunrise and Sunset are always photographed - you can also specify:
+ - How many photographs you want between Sunrise and Sunset (during the day - 0 is valid)
+ - How many photographs you want between Sunset and Sunrise (during the day - 0 is valid)
+ - Times relative to sunrise and sunset - for example Sunrise+10 for a photograph 10 minutes after Sunrise
+ - Clock Times
 
 The image below was created in Photoshop by combining the output of this program from 3 Raspberry Pi 3 A+ computers with Wide Angle Camera Module 3 cameras - the cameras face, approximately, west, north and east
 
@@ -95,7 +93,7 @@ Suggested setup: Clone, build and publish this project to a folder - then on the
 
 I like to disable the LEDs to make sure that the glass covering the lens opening won't pick up any light from the LEDS - [How To Easily Disable Status LEDs On RaspberryTips](https://raspberrytips.com/disable-leds-on-raspberry-pi/)
 
-My preference is for Automatic/Unattended Upgrades - do this long enough and something unexpected will break, but would rather stay up to date and have something break sooner rather than later. [Secure your Raspberry Pi by enabling automatic software updates – Sean Carney](https://www.seancarney.ca/2021/02/06/secure-your-raspberry-pi-by-enabling-automatic-software-updates/) and [UnattendedUpgrades - Debian Wiki](https://wiki.debian.org/UnattendedUpgrades)
+My preference is for Automatic/Unattended Upgrades - do this long enough and something unexpected will break, but I would rather stay up to date and have something break sooner rather than later. [Secure your Raspberry Pi by enabling automatic software updates – Sean Carney](https://www.seancarney.ca/2021/02/06/secure-your-raspberry-pi-by-enabling-automatic-software-updates/) and [UnattendedUpgrades - Debian Wiki](https://wiki.debian.org/UnattendedUpgrades)
 
 If you've worked in years gone by with the Pi Camera and C# you might have found the very useful [techyian/MMALSharp: C# wrapper to Broadcom's MMAL with an API to the Raspberry Pi camera.](https://github.com/techyian/MMALSharp) - without choosing an older version of Raspberry Pi OS that library no longer works - the Pi has moved on to [libcamera](https://libcamera.org/). I didn't find a C# wrapper for libcamera and since I didn't need to do anything other than write stills to the Pi's storage simply calling libcamera-still 'command line style' seemed to be the best option.
 
@@ -114,7 +112,7 @@ Recently we installed a 12V/200aH solar system near our parking area. The main p
 
  - [Raspberry Pi 3 Model A+](https://www.raspberrypi.com/products/raspberry-pi-3-model-a-plus/), [5V 2.5A Switching Power Supply with 20AWG MicroUSB Cable](https://www.adafruit.com/product/1995), 32 GB MicroSD Card and [a case from Adafruit](https://www.adafruit.com/product/2359): This is about $60 USD plus shipping - I like the $25 USD price of the 3 A+, the full sized HDMI port and the slim profile.
  - [Raspberry Pi Camera Module 3 - 12MP 120 Degree Wide Angle Lens](https://www.adafruit.com/product/5658): I love photography - you can see some of my work over on [Pointless Waymarks](https://pointlesswaymarks.com/) - so I considered a number of choices for this project but in the end the cost/convenience/size/performance of going with a $35 official camera module won out.
- - Wood Enclosure: Hopefully weatherproof (enough)! Built with spare/scrap wood, bug screen sitting in a closet and the paint for our deck. The main feature is that I recycled existing materials for this! As you can see in the photo above the carpentry is very (very!) basic so no details are included. The challenge I found with making a simple enclosure was weatherproofing the hole for the camera/lens:
+ - Wooden Enclosure: Hopefully weatherproof (enough)! Built with spare/scrap wood, bug screen sitting in a closet and the paint for our deck. The main feature is that I recycled existing materials for this... As you can see in the photo above the carpentry is very (very!) basic so no details are included. The challenge I found with making a simple enclosure was weatherproofing the hole for the camera/lens:
   - I tried using plexiglass for the entire front panel of the enclosure - but at least with the plexiglass I had the images were never sharp. I was using plexiglass left over from another (not camera oriented) project and I didn't want to dive into figuring out 'best optical quality plexiglass' (and didn't want glass for durability reasons) so I moved on.
   - To move to another strategy I mounted the camera on the front panel of the enclosure - at first with the mistake of mounting the camera tightly to the front panel - this didn't work, if you mount the camera package tightly against something you can end up impacting focus... In the end both for focus and making sure the wide angle camera has a clear view I simple made a larger hole for the camera but that made it more important to find something to cover the hole for weatherproofing.
   - I tried a plexiglass dome off of Amazon to cover the exit hole for the camera - this was great for part of the photograph but distorted the edges. It's possible that the distortion would go away if I mounted the camera farther into the dome, but that added a complication to the design I wasn't interested in.
