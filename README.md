@@ -11,7 +11,7 @@ For this program to work it requires:
 
 Sunrise and Sunset are always photographed - you can also specify:
  - How many photographs you want between Sunrise and Sunset (during the day - 0 is valid)
- - How many photographs you want between Sunset and Sunrise (during the day - 0 is valid)
+ - How many photographs you want between Sunset and Sunrise (during the night - 0 is valid)
  - Times relative to sunrise and sunset - for example Sunrise+10 for a photograph 10 minutes after Sunrise
  - Clock Times
 
@@ -22,9 +22,9 @@ The image below was created in Photoshop by combining the output of this program
 
 ### SunriseAndSunset.csv
 
-This program uses a file of Sunrise/Sunset times to allow you to input any sunrise/sunset times that you want - a strong use case for this is generating topography compensated Sunrise/Sunset times for your location. For example today at my home we didn't see the sun come over the mountains to the east until 40+ minutes after the sun rise time calculated without the topography of the mountains...
+This program uses a file of Sunrise/Sunset times to allow you to input any sunrise/sunset times that you want - a strong use case for this is generating topography compensated Sunrise/Sunset times for your location. For example today at my home we didn't see the sun come over the mountains to the east until 40+ minutes after the sun rise time calculated for the 'true' horizon...
 
-The SunriseAndSunset.csv file should be formated like the the sample file included with the program:
+The SunriseAndSunset.csv file should be formatted like the the sample file included with the program:
 ```
 DAY, SUNRISE, SUNSET
 2023-01-01,08:15:00-0700,17:23:00-0700
@@ -32,28 +32,28 @@ DAY, SUNRISE, SUNSET
 ```
 
 If you are interested in generating Topography compensated Sunrise/Sunset times for your location try:
-  - [gvellut/tppss: Compute sunrise / sunset times taking into account local topography](https://github.com/gvellut/tppss) - this is a great free way to generate the times - it does take some setup, but like me you might find preparing the data for the program is an interesting learning project!
+  - [gvellut/tppss: Compute sunrise / sunset times taking into account local topography](https://github.com/gvellut/tppss) - this is a great free way to generate the times - it does take some setup, but like me you might find preparing the data for the program is an interesting project!
   - [Find Your Location and Compute Sunlight Conditions](https://www.suncurves.com/en/) - a paid service that will do this for you.
   - Various photography apps can calculate/show you this information but I'm not sure if any of them export yearly (or multi-year) data...
 
 
 ### Settings File
 
-_DaySlices_ - Takes an integer and determines the number of photos taken between sunrise and sunset
+_DaySlices_ - Takes an integer and determines the number of photos taken between sunrise and sunset.
 
-_NightSlices_ - Takes an integer and determines the number of photos taken between sunset and sunrise
+_NightSlices_ - Takes an integer and determines the number of photos taken between sunset and sunrise.
 
-_PhotoStorageDirectory_ - the path to where the photos are written
+_PhotoStorageDirectory_ - The path to where the photos are written.
 
-_SunriseSunsetCsvFile_ - the name (including extension) of the csv file of Sunrise and Sunset times
+_SunriseSunsetCsvFile_ - The name (including extension) of the csv file of Sunrise and Sunset times.
 
-_PhotoNamePrefix_ - Prefix for the photo names, the date and time will follow the prefix and .jpg to create the filename. It is especially useful to change this if you have multiple cameras running
+_PhotoNamePrefix_ - Prefix for the photo names. The date and time will follow the prefix and .jpg to create the filename. It is especially useful to change this if you have multiple cameras running.
 
-_LogFullExceptionsToImages_ - The assumption is that this program will run largely unattended in the background and that most of the time the only thing you will see from the program is the photographs. The program will try to alert you of errors by writing exception information to an error file in the PhotoStorageDirectory. This setting determines whether the program writes all of the exception information or only an abbreviated message. This option exists because writing full exception information may leak information about your setup!
+_LogFullExceptionsToImages_ - The assumption is that this program will run largely unattended and that most of the time the only thing you will see is the photographs. The program will try to alert you of errors by writing exception information to an image file in the PhotoStorageDirectory. This setting determines whether the program writes all of the exception information or only an abbreviated message. This option exists because writing full exception information may leak information about your setup!
 
-_LibCameraParameters_ - Day/Night/Sunset/Sunrise - command line parameters for libcamera-still
+_LibCameraParameters_ - Day/Night/Sunset/Sunrise - command line parameters for libcamera-still.
 
-_CustomTimes_ - custom times can be specified either as clock times (3:45 pm) or as minutes before/after sunset (sunset +10). Each custom time also gets LibCamera parameters.
+_CustomTimes_ - Custom times can be specified either as clock times (3:45 pm) or as minutes before/after sunset (sunset +10). Each custom time also gets LibCamera parameters.
 
 ```
 "CustomTimes": [
@@ -81,7 +81,7 @@ Suggested setup: Clone, build and publish this project to a folder - then on the
 	```
 	chmod +x PiSlicedDayPhotos
 	```
- - Run the program as a service: Edit the pisliceddayphotos.service and replace [Your Directory Here], copy it to /etc/systemd/system/, start and follow the service to check for any errors:
+ - Run the program as a service: Edit the pisliceddayphotos.service replacing [Your Directory Here], copy it to /etc/systemd/system/, start and follow the service to check for any errors:
 	```
 	nano pisliceddayphotos.service
 	sudo cp pisliceddayphotos.service /etc/systemd/system/
@@ -95,16 +95,18 @@ I like to disable the LEDs to make sure that the glass covering the lens opening
 
 My preference is for Automatic/Unattended Upgrades - do this long enough and something unexpected will break, but I would rather stay up to date and have something break sooner rather than later. [Secure your Raspberry Pi by enabling automatic software updates – Sean Carney](https://www.seancarney.ca/2021/02/06/secure-your-raspberry-pi-by-enabling-automatic-software-updates/) and [UnattendedUpgrades - Debian Wiki](https://wiki.debian.org/UnattendedUpgrades)
 
-If you've worked in years gone by with the Pi Camera and C# you might have found the very useful [techyian/MMALSharp: C# wrapper to Broadcom's MMAL with an API to the Raspberry Pi camera.](https://github.com/techyian/MMALSharp) - without choosing an older version of Raspberry Pi OS that library no longer works - the Pi has moved on to [libcamera](https://libcamera.org/). I didn't find a C# wrapper for libcamera and since I didn't need to do anything other than write stills to the Pi's storage simply calling libcamera-still 'command line style' seemed to be the best option.
+If you've worked in years gone by with the Pi Camera and C# you might know the very useful [techyian/MMALSharp: C# wrapper to Broadcom's MMAL with an API to the Raspberry Pi camera](https://github.com/techyian/MMALSharp) - unfortunately without choosing an older version of Raspberry Pi OS that library no longer works. The Pi has moved on to [libcamera](https://libcamera.org/). I didn't find a C# wrapper for libcamera and since I didn't need to do anything other than write stills to the Pi's storage calling libcamera-still 'command line style' seemed to be the best option.
 
 I didn't find a single great place for libcamera-still documentation - frustrating until I figured out that (beyond 'getting started' content) running 'libcamera-still --help' was really the best single source of information.
 
 
 ### Backstory
 
-For a number of years my wife and I used a previous (now-archived) project - [cmiles/PiDropLapse](https://github.com/cmiles/PiDropLapse/tree/main) - and a [Raspberry Pi 4 Model B](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/) to take periodic photographs and sensor readings to monitor an area inside our house. Since moving to a more rural property I have wanted to do a similar project but outside and solar powered - Raspberry Pi shortages, never quite finding an in-stock dedicated Pi solar setup that I loved and other house projects delayed that idea...
+For a number of years my wife and I used a previous (now-archived) project - [cmiles/PiDropLapse](https://github.com/cmiles/PiDropLapse/tree/main) - and a [Raspberry Pi 4 Model B](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/) to take periodic photographs and sensor readings to monitor an area inside our house.
 
-Recently we installed a 12V/200aH solar system near our parking area. The main purpose of this system is to power the rodent deterrent lights for our trucks - but it has more than enough power to also power several Pis for photo purposes!
+Since moving to a more rural property I have wanted to do a similar project but outside and solar powered - Raspberry Pi shortages, never quite finding an in-stock dedicated Pi solar setup that I loved and other house projects delayed that idea...
+
+Recently we installed a 12V/200aH solar system near our parking area. The main purpose of this system is to power the rodent deterrent lights for our trucks - but luckily it has more than enough power to also power several Pis for photo purposes!
 
 ![EnclosureExample](PiSlicedDayMedia/PiSlicedDayPhotos-MostlyRecycledCameraEnclosure.jpg "The Pis I am currently housing are in simple enclosures built from spare/scrap wood, deck paint we already had and a Tiffen 55mm UV Protector Filter.")
 
@@ -112,13 +114,14 @@ Recently we installed a 12V/200aH solar system near our parking area. The main p
 
  - [Raspberry Pi 3 Model A+](https://www.raspberrypi.com/products/raspberry-pi-3-model-a-plus/), [5V 2.5A Switching Power Supply with 20AWG MicroUSB Cable](https://www.adafruit.com/product/1995), 32 GB MicroSD Card and [a case from Adafruit](https://www.adafruit.com/product/2359): This is about $60 USD plus shipping - I like the $25 USD price of the 3 A+, the full sized HDMI port and the slim profile.
  - [Raspberry Pi Camera Module 3 - 12MP 120 Degree Wide Angle Lens](https://www.adafruit.com/product/5658): I love photography - you can see some of my work over on [Pointless Waymarks](https://pointlesswaymarks.com/) - so I considered a number of choices for this project but in the end the cost/convenience/size/performance of going with a $35 official camera module won out.
- - Wooden Enclosure: Hopefully weatherproof (enough)! Built with spare/scrap wood, bug screen sitting in a closet and the paint for our deck. The main feature is that I recycled existing materials for this... As you can see in the photo above the carpentry is very (very!) basic so no details are included. The challenge I found with making a simple enclosure was weatherproofing the hole for the camera/lens:
-  - I tried using plexiglass for the entire front panel of the enclosure - but at least with the plexiglass I had the images were never sharp. I was using plexiglass left over from another (not camera oriented) project and I didn't want to dive into figuring out 'best optical quality plexiglass' (and didn't want glass for durability reasons) so I moved on.
-  - To move to another strategy I mounted the camera on the front panel of the enclosure - at first with the mistake of mounting the camera tightly to the front panel - this didn't work, if you mount the camera package tightly against something you can end up impacting focus... In the end both for focus and making sure the wide angle camera has a clear view I simple made a larger hole for the camera but that made it more important to find something to cover the hole for weatherproofing.
-  - I tried a plexiglass dome off of Amazon to cover the exit hole for the camera - this was great for part of the photograph but distorted the edges. It's possible that the distortion would go away if I mounted the camera farther into the dome, but that added a complication to the design I wasn't interested in.
-  - The solution that finally worked for me was using a UV lens filter and hot gluing it to the outside of the enclosure. I used an $8 [Tiffen 55mm UV Protector Filter](https://www.bhphotovideo.com/c/product/72714-REG/Tiffen_55UVP_55mm_UV_Protector.html) - it is easy to find smaller diameter filters but after some experiments I liked this size because it was very easy to position it so that the edge of the filter didn't end up in the photo.
- - With the mostly recycled enclosure the cost of the system is around $105 potentially a bit more with tax and shipping.
- - Solar: As mentioned above powering the system with solar was a goal - but it turns out that the solar system powering my setup wasn't designed primarily to run the Pis - but for the sake of documenting the project the main components of the system are listed below. This system is massive overkill if you just want to run a few Pis, like most real world systems I had many constraints and goals that are not in line with 'build the world's best small solar system'. This is not a recommendation regarding anything below, I don't have enough experience to do that, so use this list with caution (wiring and fuses omitted - btw if you are building a system of this size or larger for the first time be sure to look up wiring and fuses/breaker cost - it was much more than I guessed...).
+ - Wooden Enclosure: Hopefully weatherproof (enough)! Built with spare/scrap wood, bug screen sitting in a closet and the paint for our deck. The main feature is that I recycled existing materials for this... As you can see in the photo above the carpentry is very (very!) basic so no details are included. Mounting the camera and weatherproofing the exit hole for the camera/lens took a few tries:
+    - I tried using plexiglass for the entire front panel of the enclosure - but at least with the plexiglass I had the images were never sharp. I was using plexiglass left over from another (not camera oriented) project and I didn't want to dive into figuring out 'best optical quality plexiglass' (and didn't want glass for durability reasons) so I moved on.
+    - I moved from the plexiglass front panel to a wooden one. I drilled a hole large enough for the lens and mounted the camera tightly to the front panel - which didn't work, mounting the front of the camera package tightly against something can end up impacting focus...
+    - In the end for focus and to make sure the wide angle camera has a clear view I made a larger hole for the lens and used spacers to ensure the front of the camera isn't against anything. This approach made it important to find something to cover the hole for weatherproofing.
+    - I tried a plexiglass dome off of Amazon to cover the exit hole for the camera - this was great for part of the photograph but distorted the edges. It's possible that the distortion would go away if I mounted the camera farther into the dome or found a the right dome, but I wasn't interested in either of those options.
+    - The solution that finally worked for me was using a UV lens filter and hot gluing it to the outside of the enclosure. I used an $8 [Tiffen 55mm UV Protector Filter](https://www.bhphotovideo.com/c/product/72714-REG/Tiffen_55UVP_55mm_UV_Protector.html) - it is easy to find smaller diameter filters but after some experiments I liked this size because it was very easy to position it so that the edge of the filter didn't end up in the photographs.
+ - With the mostly recycled enclosure the cost of the system is around $105 - potentially a bit more with tax and shipping.
+ - Solar: As mentioned above powering the system with solar was a goal for this project - but it turns out that the solar system powering my setup isn't dedicated primarily to running the Pis... So only tangentially related, but for the sake of fully documenting the project, the main components of the solar system are listed below. This system is massive overkill if you just want to run a few Pis, like most real world systems I had many constraints and goals that are not in line with 'build the world's best small solar system'. This is not a recommendation regarding anything below, I don't have enough experience to do that, so use this list with caution (wiring and fuses omitted - btw if you are building a system like this for the first time be sure to look up wiring and fuse/breaker cost - it was much more than I guessed...).
 	- 3x [Newpowa 100W 12V Mono Compact Solar Panels](https://www.newpowa.com/new-100w-compact-12v-mono-solar-panel/)
 	- 2x [Ampere Time 12V 100Ah Lithium Batteries](https://www.amperetime.com/collections/ampere-time-12v-lithium-lifepo4-battery-series/products/ampere-time-12v-100ah-lithium-lifepo4-battery) - purchased used.
 	- [Victron Energy SmartSolar MPPT 100/20](https://www.victronenergy.com/solar-charge-controllers/smartsolar-mppt-75-10-75-15-100-15-100-20)
@@ -160,5 +163,3 @@ This program would not be possible without the amazing resources available for c
   - [NUnit.org](https://nunit.org/). [NUnit License](https://docs.nunit.org/articles/nunit/license.html)
   - [thomasgalliker/ObjectDumper: ObjectDumper is a utility which aims to serialize C# objects to string for debugging and logging purposes.](https://github.com/thomasgalliker/ObjectDumper). Apache-2.0 License.
   - [Codeuctivity/SkiaSharp.Compare: Adds compare features on top of SkiaSharp](https://github.com/Codeuctivity/SkiaSharp.Compare). Apache-2.0 License.
-
-
