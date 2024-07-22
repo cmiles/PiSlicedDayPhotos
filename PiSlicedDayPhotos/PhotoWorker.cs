@@ -222,7 +222,7 @@ public class PhotoWorker : BackgroundService
         heartBeatWatchDogTimer = new Timer((_) =>
             {
                 var timeUntilNextPhoto = _nextTime.ScheduledTime.Subtract(DateTime.Now);
-
+                
                 if (timeUntilNextPhoto.TotalSeconds >= 0)
                 {
                     Console.WriteLine($"Photo in {_nextTime.ScheduledTime.Subtract(DateTime.Now):c}");
@@ -240,6 +240,7 @@ public class PhotoWorker : BackgroundService
                             $"[Timing] Photo time of {_nextTime.ScheduledTime.ToShortOutput()} is in the Past (current time {DateTime.Now.ToShortOutput()}) - resetting Next Time to {nextTime.ScheduledTime.ToShortOutput()}");
 
                     _nextTime = nextTime;
+                    mainLoop.Change(_nextTime.ScheduledTime.Subtract(DateTime.Now), Timeout.InfiniteTimeSpan);
                 }
                 else
                 {
