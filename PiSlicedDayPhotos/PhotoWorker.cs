@@ -8,7 +8,7 @@ namespace PiSlicedDayPhotos;
 public class PhotoWorker : BackgroundService
 {
     private ScheduledPhoto _nextTime = new()
-        { Kind = PhotoKind.Day, ScheduledTime = new DateTime(2012, 1, 12, 12, 0, 0) };
+        { Kind = PhotoKind.Day, ScheduledTime = new DateTime(2012, 1, 12, 12, 0, 0), Description = "Default Scheduled Photo"};
 
     private string ErrorImageFileName(PiSlicedDaySettings userSettings)
     {
@@ -94,7 +94,7 @@ public class PhotoWorker : BackgroundService
             var currentPhotoDateTime = _nextTime;
 
             var fileName = Path.Combine(settings.PhotoStorageDirectory,
-                $"{DateTime.Now:yyyy-MM-dd-HH-mm-ss}{(string.IsNullOrWhiteSpace(settings.PhotoNamePostfix) ? "" : "-")}{settings.PhotoNamePostfix}.jpg");
+                $"{DateTime.Now:yyyy-MM-dd-HH-mm}-{currentPhotoDateTime.Description.SanitizeForFileName()}-{(string.IsNullOrWhiteSpace(settings.PhotoNamePostfix) ? "" : "-")}{settings.PhotoNamePostfix.SanitizeForFileName()}.jpg");
 
             var photoExecutable = "libcamera-still";
             var photoArguments = $"-o {fileName} {_nextTime.LibCameraParameters}".Trim();

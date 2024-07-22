@@ -2,17 +2,21 @@
 
 This is a small .NET Core (C#) program designed to be run on a Raspberry Pi that takes photographs at Sunrise, Sunset, a number of specified intervals in-between and at custom times specified either by clock time or minutes +/- from sunrise/sunset.
 
-The in-between intervals are calculated based on sunrise/sunset times provided as a CSV file. Since the provided sunrise/sunset times may take topography (or other factors) into account the photographs might not be at the same clock time/sun angle each day, but will be at the same relative time between sunrise/sunset. Living living in the shadow of a mountain peak inspired this setup, 'half way thru the available sunlight for the day' is more interesting to me than a photo taken at a certain clock time or sun angle.
+The sunrise/sunset times must be provided to the program as a CSV file - a number of libraries/APIs are available to calculate sunrise/sunset at a particular location, but taking the sunrise/sunset times from a file leaves you free to calculate them in whatever way you prefer. One of the most useful examples is generating the sunrise/sunset time taking into account local topography - the sun on an imagined horizon is not photographically useful or interesting, when the sun rises behind a mountain peak is much more interesting.
+
+The in-between intervals are calculated based on sunrise/sunset times provided as a CSV file. Since the provided sunrise/sunset times may take topography (or other factors) into account the photographs might not be at the same sun angle each day, but will be at the same relative time between sunrise/sunset.
+
+Living in the shadow of a mountain peak inspired this setup, 'half way thru the available sunlight for the day' is much more interesting to me than a photo taken at a certain clock time or sun angle...
 
 For this program to work it requires:
- - A Raspberry Pi where .NET Core can run and an attached camera that responds to libcamera-still. This program has only been confirmed to run on a Raspberry Pi 3 A+ with a Camera Module 3 Wide - but I believe any 2+ version Pis with current versions of the Raspberry Pi OS should work with any of the official Pi camera modules... 
+ - A Raspberry Pi where .NET Core can run and an attached camera that responds to libcamera-still. This program has only been confirmed to run on a Raspberry Pi 3 A+ with a Camera Module 3 Wide - but I believe any 2+ version Pis with current versions of the Raspberry Pi OS should work with any of the official Pi camera modules.
  - A settings file named PiSlicedDaySettings.json - an example is included in the code and there are notes below
  - A CSV file named SunriseAndSunset.csv with the calendar day, sunrise time (local) and sunset time (local).
 
 Sunrise and Sunset are always photographed - you can also specify:
  - How many photographs you want between Sunrise and Sunset (during the day - 0 is valid)
  - How many photographs you want between Sunset and Sunrise (during the night - 0 is valid)
- - Times relative to sunrise and sunset - for example Sunrise+10 for a photograph 10 minutes after Sunrise
+ - Times relative to sunrise and sunset - for example Sunrise-10 for a photograph 10 minutes before Sunrise or Sunset+10 for a photograph 10 minutes after Sunset.
  - Clock Times
 
 The image below was created in Photoshop by combining the output of this program from 3 Raspberry Pi 3 A+ computers with Wide Angle Camera Module 3 cameras - the cameras face, approximately, west, north and east
@@ -22,7 +26,7 @@ The image below was created in Photoshop by combining the output of this program
 
 ### SunriseAndSunset.csv
 
-This program uses a file of Sunrise/Sunset times to allow you to input any sunrise/sunset times that you want - a strong use case for this is generating topography compensated Sunrise/Sunset times for your location. For example today at my home we didn't see the sun come over the mountains to the east until 40+ minutes after the sun rise time calculated for the 'true' horizon...
+This program uses a file of Sunrise/Sunset times to allow you to input any sunrise/sunset times that you want - a strong use case for this is generating topography compensated Sunrise/Sunset times for your location. For example today at my house we didn't see the sun come over the mountains to the east until 40+ minutes after the sunrise time calculated for the 'true' (imagined) horizon...
 
 The SunriseAndSunset.csv file should be formatted like the the sample file included with the program:
 ```
@@ -122,10 +126,10 @@ Recently we installed a 12V/200aH solar system near our parking area. The main p
     - The solution that finally worked for me was using a UV lens filter and hot gluing it to the outside of the enclosure. I used an $8 [Tiffen 55mm UV Protector Filter](https://www.bhphotovideo.com/c/product/72714-REG/Tiffen_55UVP_55mm_UV_Protector.html) - it is easy to find smaller diameter filters but after some experiments I liked this size because it was very easy to position it so that the edge of the filter didn't end up in the photographs.
  - With the mostly recycled enclosure the cost of the system is around $105 - potentially a bit more with tax and shipping.
  - Solar: As mentioned above powering the system with solar was a goal for this project - but it turns out that the solar system powering my setup isn't dedicated primarily to running the Pis... So only tangentially related, but for the sake of fully documenting the project, the main components of the solar system are listed below. This system is massive overkill if you just want to run a few Pis, like most real world systems I had many constraints and goals that are not in line with 'build the world's best small solar system'. This is not a recommendation regarding anything below, I don't have enough experience to do that, so use this list with caution (wiring and fuses omitted - btw if you are building a system like this for the first time be sure to look up wiring and fuse/breaker cost - it was much more than I guessed...).
-	- 3x [Newpowa 100W 12V Mono Compact Solar Panels](https://www.newpowa.com/new-100w-compact-12v-mono-solar-panel/)
-	- 2x [Ampere Time 12V 100Ah Lithium Batteries](https://www.amperetime.com/collections/ampere-time-12v-lithium-lifepo4-battery-series/products/ampere-time-12v-100ah-lithium-lifepo4-battery) - purchased used.
-	- [Victron Energy SmartSolar MPPT 100/20](https://www.victronenergy.com/solar-charge-controllers/smartsolar-mppt-75-10-75-15-100-15-100-20)
-	- [Victron Phoenix 12V/800W Inverter](https://www.victronenergy.com/inverters/phoenix-inverter-vedirect-250va-800va) with [Victron VE.Direct Bluetooth Smart Dongle](https://www.victronenergy.com/accessories/ve-direct-bluetooth-smart-dongle)
+	- 6x [Newpowa 100W 12V Mono Compact Solar Panels](https://www.newpowa.com/new-100w-compact-12v-mono-solar-panel/) - we have increased the number of panels over time - the overwhelming majority of the load on this system is at night. 600W of panels makes it more likely that with winter storms and shorter winter days we can charge the battery bank to capacity during daylight hours.
+	- 2x [Ampere Time 12V 100Ah Lithium Batteries](https://www.amperetime.com/collections/ampere-time-12v-lithium-lifepo4-battery-series/products/ampere-time-12v-100ah-lithium-lifepo4-battery) - purchased used, originally for a 12V setup but now wired in Serial for 24V.
+	- [Victron Energy SmartSolar MPPT 100/20](https://www.victronenergy.com/solar-charge-controllers/smartsolar-mppt-75-10-75-15-100-15-100-20) - if you are buying a solar charge controller for the first time pay attention to the Nominal PV Power rating at a particular voltage - at 12V this device supports 290W, at 24V it supports 580W. We moved to 24V about 9 months in so we could connect more panels.
+	- [Victron Phoenix 24V/1200W Inverter](https://www.victronenergy.com/inverters/phoenix-inverter-vedirect-250va-800va) with [Victron VE.Direct Bluetooth Smart Dongle](https://www.victronenergy.com/accessories/ve-direct-bluetooth-smart-dongle) - we started with a 12V/800W inverter which was ok but wouldn't run some of our power tools, when we moved the system to 24V we upgraded to a 1200W inverter. Of the Victron devices we have this is the only one where the system communication doesn't seem great - the Bluetooth connection is very very useful but I don't think you can run the Bluetooth Smart Dongle and a USB connection to the Victron Remote Monitoring System at the same time which is slightly frustrating...
 	- [Victron SmartShunt](https://www.victronenergy.com/battery-monitors/smart-battery-shunt)
 	- [Raspberry Pi 3 Model A+](https://www.raspberrypi.com/products/raspberry-pi-3-model-a-plus/) running the [Victron Energy Venus OS](https://github.com/victronenergy/venus) to provide communication between the system and the [Victron Remote Monitoring System](https://www.victronenergy.com/panel-systems-remote-monitoring/vrm). See [Panbo's Raspberry Pi Victron Venus OS Install post](https://panbo.com/victrons-venus-os-on-a-raspberry-pi-install-and-configuration/) and as of 9/18/2023 see [Raspberry Pi 3A+: VRM Portal ID Missing](https://community.victronenergy.com/questions/79169/raspberry-pi-3a-vrm-id-missing.html) for critical information on getting Venus OS working correctly on the 3 A+. I used 2 [VE.Direct to USB interface cables](https://www.victronenergy.com/accessories/ve-direct-to-usb-interface) to connect the SmartSolar and SmartShunt to the Pi (currently the Bluetooth interface on the SmartSolar and SmartShunt is NOT used to connect to Victron Venus OS/Cerbo GX units! The Bluetooth does create a pretty great app experience, at least on Android...).
 

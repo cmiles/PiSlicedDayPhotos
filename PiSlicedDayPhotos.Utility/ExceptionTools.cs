@@ -12,6 +12,7 @@ public static class ExceptionTools
     ///     exception is written to the image information about the program/system could be accidentally exposed!!!!
     ///     This method traps and silently logs all exceptions.
     /// </summary>
+    /// <param name="message"></param>
     /// <param name="exception"></param>
     /// <param name="fullFileName"></param>
     /// <param name="writeAllExceptionInformation"></param>
@@ -87,12 +88,6 @@ public static class ExceptionTools
             }
 
         rs.MaxWidth = 984;
-
-        SKPaint fillPaint = new SKPaint
-        {
-            Style = SKPaintStyle.Fill,
-            Color = SKColors.White
-        };
 
         var imageInfo = new SKImageInfo(1024, (int)rs.MeasuredHeight + 40);
         using var surface = SKSurface.Create(imageInfo);

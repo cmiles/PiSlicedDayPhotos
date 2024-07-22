@@ -36,9 +36,23 @@ public class ImageExceptionTest
         //The image mask allows the line number for the exception to change so that at least minor
         //changes in this file won't cause the test to fail.
         var imageErrorTestModel = Path.Combine(AppContext.BaseDirectory, "Image-Error-Test-Model.jpg");
-        var imageErrorTestModelDifferenceMask = Path.Combine(AppContext.BaseDirectory, "Image-Error-Test-Model-Difference-Mask.png");
+        var imageErrorTestModelDifferenceMask =
+            Path.Combine(AppContext.BaseDirectory, "Image-Error-Test-Model-Difference-Mask.png");
 
         var maskedDiff = Compare.CalcDiff(imageErrorTestModel, errorImageFileName, imageErrorTestModelDifferenceMask);
+
+        //If the test is going to fail in the assert below calculate and save the difference between the test
+        //and generated images as an image written to the AppContext.BaseDirectory. This 'visual error' is
+        //probably the most likely to be useful to a developer.
+        if (maskedDiff.AbsoluteError > 0)
+        {
+            await using var fileStreamDifferenceMask = File.Create(Path.Combine(AppContext.BaseDirectory,
+                $"Image-Calculated-Difference-{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.jpg"));
+            using var maskImage = Compare.CalcDiffMaskImage(imageErrorTestModel, errorImageFileName);
+            var encodedData = maskImage.Encode(SKEncodedImageFormat.Png, 100);
+            encodedData.SaveTo(fileStreamDifferenceMask);
+        }
+
         Assert.That(maskedDiff.AbsoluteError, Is.EqualTo(0));
     }
 }

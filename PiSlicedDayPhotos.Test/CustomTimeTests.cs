@@ -8,24 +8,26 @@ internal class CustomTimeTests
     public void CustomAmbiguousTimeTest()
     {
         var result = PhotographTimeTools.GetCustomTimes(
-            new List<CustomTimeAndSettings>() { new() { LibCameraParameters = "test return", Time = "3:45" } },
+            [new() { LibCameraParameters = "test return", Time = "3:45" }],
             new DateTime(2023, 1, 15, 8, 14, 0), new DateTime(2023, 1, 15, 17, 34, 0));
 
         Assert.That(result.Count, Is.EqualTo(1));
         Assert.That(result.First().LibCameraParameters, Is.EqualTo("test return"));
         Assert.That(result.First().Time, Is.EqualTo(new DateTime(2023, 1, 15, 3, 45, 0)));
+        Assert.That(result.First().Description, Is.EqualTo("3:45"));
     }
 
     [Test]
     public void CustomNaturalLanguageNoonTimeTest()
     {
         var result = PhotographTimeTools.GetCustomTimes(
-            new List<CustomTimeAndSettings>() { new() { LibCameraParameters = "test return", Time = "noon" } },
+            [new() { LibCameraParameters = "test return", Time = "noon" }],
             new DateTime(2023, 1, 15, 8, 14, 0), new DateTime(2023, 1, 15, 17, 34, 0));
 
         Assert.That(result.Count, Is.EqualTo(1));
         Assert.That(result.First().LibCameraParameters, Is.EqualTo("test return"));
         Assert.That(result.First().Time, Is.EqualTo(new DateTime(2023, 1, 15, 12, 0, 0)));
+        Assert.That(result.First().Description, Is.EqualTo("noon"));
     }
 
     [TestCase("Sunrise-124")]
@@ -40,12 +42,13 @@ internal class CustomTimeTests
     public void CustomSunriseMinusTimeTest(string sunriseMinus)
     {
         var result = PhotographTimeTools.GetCustomTimes(
-            new List<CustomTimeAndSettings>() { new() { LibCameraParameters = "test return", Time = sunriseMinus } },
+            [new() { LibCameraParameters = "test return", Time = sunriseMinus }],
             new DateTime(2023, 1, 15, 8, 14, 0), new DateTime(2023, 1, 15, 17, 34, 0));
 
         Assert.That(result.Count, Is.EqualTo(1));
         Assert.That(result.First().LibCameraParameters, Is.EqualTo("test return"));
         Assert.That(result.First().Time, Is.EqualTo(new DateTime(2023, 1, 15, 6, 10, 0)));
+        Assert.That(result.First().Description, Is.EqualTo(sunriseMinus));
     }
 
     [TestCase("Sunrise+33")]
@@ -57,15 +60,16 @@ internal class CustomTimeTests
     [TestCase("+33mSunrise")]
     [TestCase("+33min Sunrise")]
     [TestCase("+33 minutes Sunrise")]
-    public void CustomSunrisePlusTimeTest(string sunriseMinus)
+    public void CustomSunrisePlusTimeTest(string sunsetPlus)
     {
         var result = PhotographTimeTools.GetCustomTimes(
-            new List<CustomTimeAndSettings>() { new() { LibCameraParameters = "test return", Time = sunriseMinus } },
+            [new() { LibCameraParameters = "test return", Time = sunsetPlus }],
             new DateTime(2023, 1, 15, 8, 14, 0), new DateTime(2023, 1, 15, 17, 34, 0));
 
         Assert.That(result.Count, Is.EqualTo(1));
         Assert.That(result.First().LibCameraParameters, Is.EqualTo("test return"));
         Assert.That(result.First().Time, Is.EqualTo(new DateTime(2023, 1, 15, 8, 47, 0)));
+        Assert.That(result.First().Description, Is.EqualTo(sunsetPlus));
     }
 
     [TestCase("Sunset-24")]
@@ -80,12 +84,13 @@ internal class CustomTimeTests
     public void CustomSunsetMinusTimeTest(string sunsetMinus)
     {
         var result = PhotographTimeTools.GetCustomTimes(
-            new List<CustomTimeAndSettings>() { new() { LibCameraParameters = "test return", Time = sunsetMinus } },
+            [new() { LibCameraParameters = "test return", Time = sunsetMinus }],
             new DateTime(2023, 1, 15, 8, 14, 0), new DateTime(2023, 1, 15, 17, 34, 0));
 
         Assert.That(result.Count, Is.EqualTo(1));
         Assert.That(result.First().LibCameraParameters, Is.EqualTo("test return"));
         Assert.That(result.First().Time, Is.EqualTo(new DateTime(2023, 1, 15, 17, 10, 0)));
+        Assert.That(result.First().Description, Is.EqualTo(sunsetMinus));
     }
 
     [TestCase("Sunset+1")]
@@ -97,27 +102,29 @@ internal class CustomTimeTests
     [TestCase("+1mSunset")]
     [TestCase("+1min Sunset")]
     [TestCase("+1 minutes Sunset")]
-    public void CustomSunsetPlusTimeTest(string sunsetMinus)
+    public void CustomSunsetPlusTimeTest(string sunsetPlus)
     {
         var result = PhotographTimeTools.GetCustomTimes(
-            new List<CustomTimeAndSettings>() { new() { LibCameraParameters = "test return", Time = sunsetMinus } },
+            [new() { LibCameraParameters = "test return", Time = sunsetPlus }],
             new DateTime(2023, 1, 15, 8, 14, 0), new DateTime(2023, 1, 15, 17, 34, 0));
 
         Assert.That(result.Count, Is.EqualTo(1));
         Assert.That(result.First().LibCameraParameters, Is.EqualTo("test return"));
         Assert.That(result.First().Time, Is.EqualTo(new DateTime(2023, 1, 15, 17, 35, 0)));
+        Assert.That(result.First().Description, Is.EqualTo(sunsetPlus));
     }
 
     [Test]
     public void CustomTimeTest()
     {
         var result = PhotographTimeTools.GetCustomTimes(
-            new List<CustomTimeAndSettings>() { new() { LibCameraParameters = "test return", Time = "3:45 pm" } },
+            [new() { LibCameraParameters = "test return", Time = "3:45 pm" }],
             new DateTime(2023, 1, 15, 8, 14, 0), new DateTime(2023, 1, 15, 17, 34, 0));
 
         Assert.That(result.Count, Is.EqualTo(1));
         Assert.That(result.First().LibCameraParameters, Is.EqualTo("test return"));
         Assert.That(result.First().Time, Is.EqualTo(new DateTime(2023, 1, 15, 15, 45, 0)));
+        Assert.That(result.First().Description, Is.EqualTo("3:45 pm"));
     }
 
     [Test]
@@ -125,7 +132,7 @@ internal class CustomTimeTests
     {
         Assert.Throws<Exception>(() =>
             PhotographTimeTools.GetCustomTimes(
-                new List<CustomTimeAndSettings>() { new() { LibCameraParameters = "test return", Time = "Sunrise +0.1" } },
+                [new() { LibCameraParameters = "test return", Time = "Sunrise +0.1" }],
                 new DateTime(2023, 1, 15, 8, 14, 0), new DateTime(2023, 1, 15, 17, 34, 0)));
     }
 
@@ -134,7 +141,7 @@ internal class CustomTimeTests
     {
         Assert.Throws<Exception>(() =>
             PhotographTimeTools.GetCustomTimes(
-                new List<CustomTimeAndSettings>() { new() { LibCameraParameters = "test return", Time = "-.99 Sunset" } },
+                [new() { LibCameraParameters = "test return", Time = "-.99 Sunset" }],
                 new DateTime(2023, 1, 15, 8, 14, 0), new DateTime(2023, 1, 15, 17, 34, 0)));
     }
 
@@ -143,7 +150,7 @@ internal class CustomTimeTests
     {
         Assert.Throws<Exception>(() =>
             PhotographTimeTools.GetCustomTimes(
-                new List<CustomTimeAndSettings>() { new() { LibCameraParameters = "test return", Time = "Sunrise" } },
+                [new() { LibCameraParameters = "test return", Time = "Sunrise" }],
                 new DateTime(2023, 1, 15, 8, 14, 0), new DateTime(2023, 1, 15, 17, 34, 0)));
     }
 
@@ -152,7 +159,7 @@ internal class CustomTimeTests
     {
         Assert.Throws<Exception>(() =>
             PhotographTimeTools.GetCustomTimes(
-                new List<CustomTimeAndSettings>() { new() { LibCameraParameters = "test return", Time = "Sunset" } },
+                [new() { LibCameraParameters = "test return", Time = "Sunset" }],
                 new DateTime(2023, 1, 15, 8, 14, 0), new DateTime(2023, 1, 15, 17, 34, 0)));
     }
 
@@ -161,7 +168,7 @@ internal class CustomTimeTests
     {
         Assert.Throws<Exception>(() =>
             PhotographTimeTools.GetCustomTimes(
-                new List<CustomTimeAndSettings>() { new() { LibCameraParameters = "test return", Time = "Sunrise1440" } },
+                [new() { LibCameraParameters = "test return", Time = "Sunrise1440" }],
                 new DateTime(2023, 1, 15, 8, 14, 0), new DateTime(2023, 1, 15, 17, 34, 0)));
     }
 
@@ -170,7 +177,7 @@ internal class CustomTimeTests
     {
         Assert.Throws<Exception>(() =>
             PhotographTimeTools.GetCustomTimes(
-                new List<CustomTimeAndSettings>() { new() { LibCameraParameters = "test return", Time = "-25999877 Sunset" } },
+                [new() { LibCameraParameters = "test return", Time = "-25999877 Sunset" }],
                 new DateTime(2023, 1, 15, 8, 14, 0), new DateTime(2023, 1, 15, 17, 34, 0)));
     }
 
@@ -179,7 +186,7 @@ internal class CustomTimeTests
     {
         Assert.Throws<Exception>(() =>
             PhotographTimeTools.GetCustomTimes(
-                new List<CustomTimeAndSettings>() { new() { LibCameraParameters = "test return", Time = "Sunrise +0" } },
+                [new() { LibCameraParameters = "test return", Time = "Sunrise +0" }],
                 new DateTime(2023, 1, 15, 8, 14, 0), new DateTime(2023, 1, 15, 17, 34, 0)));
     }
 
@@ -188,7 +195,7 @@ internal class CustomTimeTests
     {
         Assert.Throws<Exception>(() =>
             PhotographTimeTools.GetCustomTimes(
-                new List<CustomTimeAndSettings>() { new() { LibCameraParameters = "test return", Time = "-0Sunset" } },
+                [new() { LibCameraParameters = "test return", Time = "-0Sunset" }],
                 new DateTime(2023, 1, 15, 8, 14, 0), new DateTime(2023, 1, 15, 17, 34, 0)));
     }
 }

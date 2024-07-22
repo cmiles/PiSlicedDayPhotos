@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using PiSlicedDayPhotos;
+﻿using PiSlicedDayPhotos;
 using PiSlicedDayPhotos.Utility;
 
 LogTools.StandardStaticLoggerForProgramDirectory("PiSlicedDayPhotos");

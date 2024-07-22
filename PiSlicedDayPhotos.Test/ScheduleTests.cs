@@ -82,17 +82,40 @@ public class ScheduleTests
         Assert.That(schedule.Count, Is.EqualTo(12));
         Assert.That(schedule.Select(x => x.ScheduledTime).ToList(), Is.EquivalentTo(expectedDateTimeResults));
         Assert.That(schedule[0].Kind, Is.EqualTo(PhotoKind.Night));
+        Assert.That(schedule[0].Description, Is.EqualTo("NightSlice1of1"));
+
         Assert.That(schedule[1].Kind, Is.EqualTo(PhotoKind.Custom));
+        Assert.That(schedule[1].Description, Is.EqualTo("Sunrise-10m"));
+
         Assert.That(schedule[2].Kind, Is.EqualTo(PhotoKind.Sunrise));
+        Assert.That(schedule[2].Description, Is.EqualTo("Sunrise"));
+
         Assert.That(schedule[3].Kind, Is.EqualTo(PhotoKind.Day));
+        Assert.That(schedule[3].Description, Is.EqualTo("DaySlice1of1"));
+
         Assert.That(schedule[4].Kind, Is.EqualTo(PhotoKind.Sunset));
+        Assert.That(schedule[4].Description, Is.EqualTo("Sunset"));
+
         Assert.That(schedule[5].Kind, Is.EqualTo(PhotoKind.Custom));
+        Assert.That(schedule[5].Description, Is.EqualTo("Sunset+10m"));
+        
         Assert.That(schedule[6].Kind, Is.EqualTo(PhotoKind.Night));
+        Assert.That(schedule[6].Description, Is.EqualTo("NightSlice1of1"));
+
         Assert.That(schedule[7].Kind, Is.EqualTo(PhotoKind.Custom));
+        Assert.That(schedule[7].Description, Is.EqualTo("Sunrise-10m"));
+
         Assert.That(schedule[8].Kind, Is.EqualTo(PhotoKind.Sunrise));
+        Assert.That(schedule[8].Description, Is.EqualTo("Sunrise"));
+
         Assert.That(schedule[9].Kind, Is.EqualTo(PhotoKind.Day));
+        Assert.That(schedule[9].Description, Is.EqualTo("DaySlice1of1"));
+
         Assert.That(schedule[10].Kind, Is.EqualTo(PhotoKind.Sunset));
+        Assert.That(schedule[10].Description, Is.EqualTo("Sunset"));
+
         Assert.That(schedule[11].Kind, Is.EqualTo(PhotoKind.Custom));
+        Assert.That(schedule[11].Description, Is.EqualTo("Sunset+10m"));
     }
 
     [Test]
@@ -127,13 +150,28 @@ public class ScheduleTests
         Assert.That(schedule.Count, Is.EqualTo(8));
         Assert.That(schedule.Select(x => x.ScheduledTime).ToList(), Is.EquivalentTo(expectedDateTimeResults));
         Assert.That(schedule[0].Kind, Is.EqualTo(PhotoKind.Night));
+        Assert.That(schedule[0].Description, Is.EqualTo("NightSlice1of1"));
+
         Assert.That(schedule[1].Kind, Is.EqualTo(PhotoKind.Sunrise));
+        Assert.That(schedule[1].Description, Is.EqualTo("Sunrise"));
+
         Assert.That(schedule[2].Kind, Is.EqualTo(PhotoKind.Day));
+        Assert.That(schedule[2].Description, Is.EqualTo("DaySlice1of1"));
+
         Assert.That(schedule[3].Kind, Is.EqualTo(PhotoKind.Sunset));
+        Assert.That(schedule[3].Description, Is.EqualTo("Sunset"));
+
         Assert.That(schedule[4].Kind, Is.EqualTo(PhotoKind.Night));
+        Assert.That(schedule[4].Description, Is.EqualTo("NightSlice1of1"));
+
         Assert.That(schedule[5].Kind, Is.EqualTo(PhotoKind.Sunrise));
+        Assert.That(schedule[5].Description, Is.EqualTo("Sunrise"));
+
         Assert.That(schedule[6].Kind, Is.EqualTo(PhotoKind.Day));
+        Assert.That(schedule[6].Description, Is.EqualTo("DaySlice1of1"));
+
         Assert.That(schedule[7].Kind, Is.EqualTo(PhotoKind.Sunset));
+        Assert.That(schedule[7].Description, Is.EqualTo("Sunset"));
     }
 
     [Test]
