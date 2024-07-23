@@ -9,8 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		LICENSE = LICENSE
 		pisliceddayphotos.service = pisliceddayphotos.service
 		README.md = README.md
-		RedeployPiSlicedDayPhotos-Linqpad.linq = RedeployPiSlicedDayPhotos-Linqpad.linq
-		SftpPiSlicedDayPhotosToLocalDirectory-Linqpad.linq = SftpPiSlicedDayPhotosToLocalDirectory-Linqpad.linq
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PiSlicedDayPhotos.Utility", "PiSlicedDayPhotos.Utility\PiSlicedDayPhotos.Utility.csproj", "{71A31867-50FC-4F80-9B2B-7A37F5639A1B}"

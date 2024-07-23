@@ -3,29 +3,39 @@
   <Namespace>Renci.SshNet</Namespace>
 </Query>
 
-/// <summary>This is a simple Linqpad script to transfer Pi Sliced Day Photographs from a Pi to another computer via SFTP.
-/// There are an endless number of ways to do this - but running this script via the Windows Task Scheduler with lprun?.exe
-/// is one simple solution.
-/// </summary>
-void Main()
+void Main(string[] args)
 {
-	var username = "[username]";
-	var password = "[password]";
-	var piPhotoDirectory = $"/home/{username}/SlicedPhotos";
-	var localPhotoDirectory = @"M:\GmhDataWell\SolarSepticPhotos\";
+	Console.WriteLine("Starting Sftp PiSlicedDayPhotos to Local Directory - Version 7/22/2024");
 
-	CopyFrom("[pi 1 network name]", username, password, piPhotoDirectory, localPhotoDirectory);
-	//CopyFrom("[pi 2 network name]", username, password, piPhotoDirectory, localPhotoDirectory);
-	//CopyFrom("[pi 3 network name]", username, password, piPhotoDirectory, localPhotoDirectory);
+	if (args.Length != 4)
+	{
+		Console.WriteLine("This program needs exactly 4 parameters:");
+		Console.WriteLine(" username");
+		Console.WriteLine(" password");
+		Console.WriteLine(" host");
+		Console.WriteLine(" local directory for photos");
+		return;
+	}
+
+	var username = args[0];
+	var piProgramDirectory = $"/home/{username}/SlicedPhotos";
+	var password = args[1];
+	var host = args[2];
+	var localDirectoryForPhotos = args[3];
+
+	CopyPiSlicedPhotosFromRemote(host, username, password, piProgramDirectory, localDirectoryForPhotos);
 }
 
-public static void CopyFrom(string machineName, string userName, string password, string copyFromDirectory, string copyToDirectory)
+public static void CopyPiSlicedPhotosFromRemote(string machineName, string userName, string password, string copyFromDirectory, string copyToDirectory)
 {
+	Console.WriteLine($"Opening SFTP Connection to {machineName}");
+	
 	var sourceSftpConnection = new ConnectionInfo(machineName, userName, new Renci.SshNet.PasswordAuthenticationMethod(userName, password));
 
 	using var client = new SftpClient(sourceSftpConnection);
-	
 	client.Connect();
+
+	Console.WriteLine($"Getting remote file list from {copyFromDirectory}");
 
 	var sourceFileList = client.ListDirectory(copyFromDirectory);
 
@@ -34,9 +44,14 @@ public static void CopyFrom(string machineName, string userName, string password
 	Console.WriteLine($"Found {sourceJpegs.Count()} .jpg files out of {sourceFileList.Count()} total source files");
 
 	var targetDirectory = new DirectoryInfo(copyToDirectory);
+	if (!targetDirectory.Exists)
+	{
+		Console.WriteLine($"The target directory {targetDirectory} doesn't exist - Creating...");
+		targetDirectory.Create();
+	}
 	
-	if (!targetDirectory.Exists) targetDirectory.Create();
-
+	Console.WriteLine($"Listing *.jpg Files in {targetDirectory}");
+	
 	var targetJpegs = targetDirectory.EnumerateFiles("*.jpg").Select(x => x.Name).OrderBy(x => x).ToList();
 
 	var toCopy = sourceJpegs.Where(x => !targetJpegs.Contains(x.Name)).OrderBy(x => x.Name).ToList();
@@ -48,7 +63,6 @@ public static void CopyFrom(string machineName, string userName, string password
 		var newFileName = Path.Combine(copyToDirectory, loopCopy.Name);
 
 		using Stream fileStream = File.Create(newFileName);
-		
 		client.DownloadFile(loopCopy.FullName, fileStream);
 
 		Console.WriteLine($"  Copied {newFileName}");

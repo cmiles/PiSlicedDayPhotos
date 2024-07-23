@@ -1,6 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
   <ItemGroup>
+    <Content Remove="PiSlicedDaySettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="GitInfo" Version="3.3.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -29,13 +33,22 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Content Include="..\LICENSE" Link="LICENSE">
+    <None Include="..\LICENSE" Link="LICENSE">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\pisliceddayphotos.service" Link="pisliceddayphotos.service">
+    </None>
+    <None Include="..\pisliceddayphotos.service" Link="pisliceddayphotos.service">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </None>
     <None Include="..\README.md" Link="README.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\RedeployPiSlicedDayPhotos-Linqpad.linq" Link="RedeployPiSlicedDayPhotos-Linqpad.linq">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\SftpPiSlicedDayPhotosToLocalDirectory-Linqpad.linq" Link="SftpPiSlicedDayPhotosToLocalDirectory-Linqpad.linq">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PiSlicedDaySettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

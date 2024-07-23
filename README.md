@@ -126,6 +126,8 @@ My preference is for Automatic/Unattended Upgrades - do this long enough and som
 	sudo dpkg-reconfigure --priority=low unattended-upgrades
 	```
 
+I use two [LINQPad](https://www.linqpad.net/) scripts to help re-deploy the program (more useful for development work) and to copy the photos from the Pis to a central computer: RedeployPiSlicedDayPhotos-Linqpad.linq and SftpPiSlicedDayPhotosToLocalDirectory-Linqpad.linq. These are included in the repository and are setup to take commandline arguments. I run both via the [PointlessWaymarks Powershell Runner](https://github.com/cmiles/PointlessWaymarksProject/tree/main/PointlessWaymarks.PowershellRunnerGui) to make it easy to schedule and to have the commandline arguments saved with appropriate security.
+
 If you've worked in years gone by with the Pi Camera and C# you might know the very useful [techyian/MMALSharp: C# wrapper to Broadcom's MMAL with an API to the Raspberry Pi camera](https://github.com/techyian/MMALSharp) - unfortunately without choosing an older version of Raspberry Pi OS that library no longer works. The Pi has moved on to [libcamera](https://libcamera.org/). I didn't find a C# wrapper for libcamera and since I didn't need to do anything other than write stills to the Pi's storage calling libcamera-still 'command line style' seemed to be the best option.
 
 I didn't find a single great place for libcamera-still documentation - frustrating until I figured out that (beyond 'getting started' content) running 'libcamera-still --help' was really the best single source of information.

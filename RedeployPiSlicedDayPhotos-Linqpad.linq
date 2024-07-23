@@ -3,46 +3,59 @@
   <Namespace>Renci.SshNet</Namespace>
 </Query>
 
-/// <summary>This Linqpad script can be an easy way to re-deploy the Pi Sliced Day program especially
-/// if you are running it on multiple Pis. This is NOT appropriate for use installing the program (it
-/// does not create the directory structures, set up a service, ...) but for re-deploying the program
-/// it is suitable because it will not overwrite your settings or sunrise/sunset files.
-/// </summary>
-void Main()
+void Main (string[] args)
 {
-	var username = "[username]";
-	var password = "[password]";
-	var publishDirectory = @"M:\PiSlicedDayPhotos";
-	var piProgramDirectory = $"/home/{username}/PiSlicedDayPhotos";
+	Console.WriteLine("Starting Redeply Pi Sliced Day Photos - version 7/22/2024");
+	
+	if(args.Length != 3){
+		Console.WriteLine("This program needs exactly 3 parameters:");
+		Console.WriteLine(" username");
+		Console.WriteLine(" password");
+		Console.WriteLine(" host");
+		return;
+	}
 
-	CopyExecutableTo("[pi 1 network name]", username, password, publishDirectory, piProgramDirectory);
-	//CopyExecutableTo("[pi 2 network name]", username, password, publishDirectory, piProgramDirectory);
-	//CopyExecutableTo("[pi 3 network name]", username, password, publishDirectory, piProgramDirectory);
+	var username = args[0];
+	var piRemoteProgramDirectory = $"/home/{username}/PiSlicedDayPhotos";
+	var password = args[1];
+	var host = args[2];
+
+	var piSlicedPhotosLocalPublishDirectory = @"M:\PiSlicedDayPhotos";
+
+	CopyExecutableTo(host, username, password, piSlicedPhotosLocalPublishDirectory, piRemoteProgramDirectory);
 }
 
 public static void CopyExecutableTo(string machineName, string userName, string password, string copyFromDirectory, string copyToDirectory)
 {
-var connectionInfo = new ConnectionInfo(machineName, userName, new Renci.SshNet.PasswordAuthenticationMethod(userName, password));
+	var connectionInfo = new ConnectionInfo(machineName, userName, new Renci.SshNet.PasswordAuthenticationMethod(userName, password));
 
-var uploadList = new List<FileInfo> {
+	var uploadList = new List<FileInfo> {
 		new FileInfo(Path.Combine(copyFromDirectory, "PiSlicedDayPhotos")),
 		new FileInfo(Path.Combine(copyFromDirectory, "README.md")),
 		new FileInfo(Path.Combine(copyFromDirectory, "LICENSE"))
 	};
 
+	Console.WriteLine($"Files to Copy: {string.Join(", ", uploadList.Select(x => x.FullName))}");
+
 	using var sshClient = new SshClient(connectionInfo);
 
 	try
 	{
+		Console.WriteLine($"Connecting via SSH to {machineName}");
 		sshClient.Connect();
 
+		Console.WriteLine("Stopping pisliceddayphotos");
 		sshClient.RunCommand("sudo systemctl stop pisliceddayphotos");
 
+		Console.WriteLine($"Connecting via SFTP to {machineName}");
 		using var sftpClient = new SftpClient(connectionInfo);
 		sftpClient.Connect();
 
+		var counter = 0;
+		
 		foreach (var loopFile in uploadList)
 		{
+			Console.WriteLine($"Uploading file {++counter} of {uploadList.Count()}");
 			using Stream fileStream = File.Open(loopFile.FullName, FileMode.Open);
 			sftpClient.UploadFile(fileStream, $"{copyToDirectory}/{loopFile.Name}");
 
@@ -51,6 +64,7 @@ var uploadList = new List<FileInfo> {
 	}
 	finally
 	{
+		Console.WriteLine("Starting pisliceddayphotos");
 		sshClient.RunCommand("sudo systemctl start pisliceddayphotos");
 	}
 }
