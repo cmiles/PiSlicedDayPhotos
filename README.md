@@ -143,9 +143,7 @@ I have been running 3 Raspberry Pi 3 A+ computers with the Wide Angle Camera Mod
 
 For a number of years my wife and I used a previous (now-archived) project - [cmiles/PiDropLapse](https://github.com/cmiles/PiDropLapse/tree/main) - and a [Raspberry Pi 4 Model B](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/) to take periodic photographs and sensor readings to monitor an area inside our house.
 
-Since moving to a more rural property I have wanted to do a similar project but outside and solar powered - Raspberry Pi shortages, never quite finding an in-stock dedicated Pi solar setup that I loved and other house projects delayed that idea...
-
-Recently we installed a 12V/200aH solar system near our parking area. The main purpose of this system is to power the rodent deterrent lights for our trucks - but luckily it has more than enough power to also power several Pis for photo purposes!
+Since moving to a more rural property several years ago I wanted to do a similar project but outside and solar powered. Raspberry Pi shortages around the time we moved, never quite finding an in-stock dedicated Pi solar setup that I loved and other house projects delayed the idea... Until 2023 when we installed a small offgrid solar system near our parking area. The main purpose of the solar system is to power the rodent deterrent lights for our trucks - but it has more than enough power to also power several Pis for photo purposes!
 
 ![EnclosureExample](PiSlicedDayMedia/PiSlicedDayPhotos-MostlyRecycledCameraEnclosure.jpg "The Pis I am currently housing are in simple enclosures built from spare/scrap wood, deck paint we already had and a Tiffen 55mm UV Protector Filter.")
 
