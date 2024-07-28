@@ -42,10 +42,10 @@
     <None Include="..\README.md" Link="README.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\RedeployPiSlicedDayPhotos-Linqpad.linq" Link="RedeployPiSlicedDayPhotos-Linqpad.linq">
+    <None Include="..\RedeployPiSlicedDayPhotos.csx" Link="RedeployPiSlicedDayPhotos.csx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\SftpPiSlicedDayPhotosToLocalDirectory-Linqpad.linq" Link="SftpPiSlicedDayPhotosToLocalDirectory-Linqpad.linq">
+    <None Include="..\SftpPiSlicedDayPhotosToLocalDirectory.csx" Link="SftpPiSlicedDayPhotosToLocalDirectory.csx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="PiSlicedDaySettings.json">
