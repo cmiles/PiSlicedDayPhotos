@@ -1,11 +1,11 @@
 <Project>
   <PropertyGroup>
-    <LangVersion>latest</LangVersion>
     <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <Platforms>x64</Platforms>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <MetalamaAllowPreviewLanguageFeatures>true</MetalamaAllowPreviewLanguageFeatures>
   </PropertyGroup>
   <PropertyGroup>
     <DebugType>embedded</DebugType>
