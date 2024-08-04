@@ -4,9 +4,9 @@ using PointlessWaymarks.CommonTools;
 
 namespace PiSlicedDayPhotos.TimelapseHelperGui;
 
-public static class PowerShellRunnerGuiSettingTools
+public static class TimelapseHelperGuiSettingsTools
 {
-    public static PiSlicedDayPhotosTimelapseHelperGuiSettings ReadSettings()
+    public static TimelapseHelperGuiSettings ReadSettings()
     {
         var settingsFileName = Path.Combine(FileLocationTools.DefaultStorageDirectory().FullName,
             "PwPowerShellRunnerSettings.json");
@@ -14,17 +14,17 @@ public static class PowerShellRunnerGuiSettingTools
 
         if (!settingsFile.Exists)
         {
-            File.WriteAllText(settingsFile.FullName, JsonSerializer.Serialize(new PiSlicedDayPhotosTimelapseHelperGuiSettings()));
+            File.WriteAllText(settingsFile.FullName, JsonSerializer.Serialize(new TimelapseHelperGuiSettings()));
 
-            return new PiSlicedDayPhotosTimelapseHelperGuiSettings();
+            return new TimelapseHelperGuiSettings();
         }
 
-        return JsonSerializer.Deserialize<PiSlicedDayPhotosTimelapseHelperGuiSettings>(
+        return JsonSerializer.Deserialize<TimelapseHelperGuiSettings>(
                    FileAndFolderTools.ReadAllText(settingsFileName)) ??
-               new PiSlicedDayPhotosTimelapseHelperGuiSettings();
+               new TimelapseHelperGuiSettings();
     }
 
-    public static async Task WriteSettings(PiSlicedDayPhotosTimelapseHelperGuiSettings settings)
+    public static async Task WriteSettings(TimelapseHelperGuiSettings settings)
     {
         var settingsFileName = Path.Combine(FileLocationTools.DefaultStorageDirectory().FullName,
             "PiSlicedDayPhotosTimelapseHelper.json");

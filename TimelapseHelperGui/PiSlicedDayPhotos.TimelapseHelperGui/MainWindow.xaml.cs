@@ -53,7 +53,7 @@ public partial class MainWindow
 
     public async Task CheckForProgramUpdate(string currentDateVersion)
     {
-        var settings = PowerShellRunnerGuiSettingTools.ReadSettings();
+        var settings = TimelapseHelperGuiSettingsTools.ReadSettings();
 
         Log.Information(
             $"Program Update Check - Current Version {currentDateVersion}, Installer Directory {settings.ProgramUpdateDirectory}");
