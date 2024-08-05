@@ -7,8 +7,9 @@
         xmlns:windowScreenShot="clr-namespace:PointlessWaymarks.WpfCommon.WindowScreenShot;assembly=PointlessWaymarks.WpfCommon"
         xmlns:programUpdateMessage="clr-namespace:PointlessWaymarks.WpfCommon.ProgramUpdateMessage;assembly=PointlessWaymarks.WpfCommon"
         xmlns:status="clr-namespace:PointlessWaymarks.WpfCommon.Status;assembly=PointlessWaymarks.WpfCommon"
+        xmlns:controls="clr-namespace:PiSlicedDayPhotos.TimelapseHelperGui.Controls"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" d:DataContext="{d:DesignInstance local:MainWindow}">
+        Title="{Binding InfoTitle}" Height="450" Width="800" d:DataContext="{d:DesignInstance local:MainWindow}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -17,6 +18,7 @@
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
+        <controls:TimelapseGeneratorControl DataContext="{Binding TimelapseContext}"></controls:TimelapseGeneratorControl>
         <programUpdateMessage:ProgramUpdateMessageControl VerticalAlignment="Top" HorizontalAlignment="Center"
                                                           Width="400" DataContext="{Binding UpdateMessageContext}" />
         <status:StatusControl

@@ -1,4 +1,4 @@
-﻿using System.Windows;
+﻿using PiSlicedDayPhotos.TimelapseHelperGui.Controls;
 using PointlessWaymarks.CommonTools;
 using PointlessWaymarks.LlamaAspects;
 using PointlessWaymarks.WpfCommon.ProgramUpdateMessage;
@@ -43,13 +43,21 @@ public partial class MainWindow
         BuildCommands();
 
         StatusContext.RunFireAndForgetBlockingTask(async () => { await CheckForProgramUpdate(currentDateVersion); });
+        StatusContext.RunFireAndForgetBlockingTask(Setup);
     }
+
+    public object TimelapseContext { get; set; }
 
     public ProgramUpdateMessageContext UpdateMessageContext { get; set; }
 
     public StatusControlContext StatusContext { get; set; }
 
     public string InfoTitle { get; set; }
+
+    private async Task Setup()
+    {
+        TimelapseContext = await TimelapseGeneratorContext.CreateInstance(StatusContext);
+    }
 
     public async Task CheckForProgramUpdate(string currentDateVersion)
     {

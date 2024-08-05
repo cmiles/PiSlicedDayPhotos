@@ -27,7 +27,7 @@ namespace PiSlicedDayPhotos.TimelapseHelperGui
         {
             var baseDirectory = DefaultStorageDirectory();
             var suggestedDirectory = Path.Combine(baseDirectory.FullName,
-                $"TimeLapseTempStorage-{DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+                $"TimeLapseTempStorage-{DateTime.Now:yyyy-MM-dd HH-mm-ss}");
 
             return UniqueFileTools.UniqueDirectory(suggestedDirectory);
         }

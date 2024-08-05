@@ -1,11 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using Ookii.Dialogs.Wpf;
-using PointlessWaymarks.CommonTools;
 using PointlessWaymarks.LlamaAspects;
 using PointlessWaymarks.WpfCommon;
+using PointlessWaymarks.WpfCommon.ConversionDataEntry;
 using PointlessWaymarks.WpfCommon.Status;
 
 namespace PiSlicedDayPhotos.TimelapseHelperGui.Controls;
@@ -16,41 +17,75 @@ public partial class TimelapseGeneratorContext
 {
     public TimelapseGeneratorContext()
     {
-        BuildCommands();
         PropertyChanged += OnPropertyChanged;
     }
 
     public bool CameraCombinedMode { get; set; }
     public bool SliceCombinedMode { get; set; }
-    public required ObservableCollection<PiSlicedDayPhotoInformation> SourcePhotoInformation { get; set; }
+    public required ObservableCollection<PiSlicedDayPhotoInformation> SourcePhotos { get; set; }
+    public required ObservableCollection<PiSlicedDayPhotoInformation> SelectedPhotos { get; set; }
     public required ObservableCollection<CameraListItem> CameraItems { get; set; }
     public required ObservableCollection<TimeDescriptionListItem> TimeDescriptionItems { get; set; }
-    public List<CameraListItem> SelectedCameraItems { get; set; } = [];
-    public List<TimeDescriptionListItem> SelectedTimeDescriptionItems { get; set; } = [];
     public required StatusControlContext StatusContext { get; set; }
     public string SourceFolder { get; set; } = string.Empty;
-
     public int FrameRate { get; set; } = 6;
+    public int NumberOfSelectedPhotos { get; set; }
+    public DateTime? SelectedPhotosStartOn { get; set; }
+    public DateTime? SelectedPhotosEndOn { get; set; }
 
-    public static async Task CreateInstance(StatusControlContext statusContext)
+    public required ConversionDataEntryContext<DateTime?> TimeLapseStartsOnEntry { get; set; }
+    public required ConversionDataEntryContext<DateTime?> TimeLapseEndsOnEntry { get; set; }
+
+    public static async Task<TimelapseGeneratorContext> CreateInstance(StatusControlContext statusContext)
     {
         await ThreadSwitcher.ResumeForegroundAsync();
         var factoryCameraItems = new ObservableCollection<CameraListItem>();
         var factoryTimeDescriptionItems = new ObservableCollection<TimeDescriptionListItem>();
-        var factorySourcePhotoInformation = new ObservableCollection<PiSlicedDayPhotoInformation>();
+        var factorySourcePhotos = new ObservableCollection<PiSlicedDayPhotoInformation>();
+        var factorySelectedPhotos = new ObservableCollection<PiSlicedDayPhotoInformation>();
+
+        var factoryStartsOnEntry =
+            await ConversionDataEntryContext<DateTime?>.CreateInstance(ConversionDataEntryHelpers
+                .DateTimeNullableConversion);
+        factoryStartsOnEntry.Title = "Photos After - Blank will start with the Earliest Possible Photo";
+        factoryStartsOnEntry.HelpText = "Only include photos taken on or after this date.";
+
+        var factoryEndsOnEntry =
+            await ConversionDataEntryContext<DateTime?>.CreateInstance(ConversionDataEntryHelpers
+                .DateTimeNullableConversion);
+        factoryEndsOnEntry.Title = "Photos Before - Blank will start with the Last Possible Photo";
+        factoryEndsOnEntry.HelpText = "Only include photos taken on or before this date.";
 
         var newControl = new TimelapseGeneratorContext
         {
             CameraItems = factoryCameraItems,
             TimeDescriptionItems = factoryTimeDescriptionItems,
-            SourcePhotoInformation = factorySourcePhotoInformation,
-            StatusContext = statusContext
+            SourcePhotos = factorySourcePhotos,
+            SelectedPhotos = factorySelectedPhotos,
+            StatusContext = statusContext,
+            TimeLapseStartsOnEntry = factoryStartsOnEntry,
+            TimeLapseEndsOnEntry = factoryEndsOnEntry
         };
 
         await ThreadSwitcher.ResumeBackgroundAsync();
 
+        newControl.BuildCommands();
         var settings = TimelapseHelperGuiSettingsTools.ReadSettings();
         newControl.SourceFolder = settings.LastInputDirectory ?? string.Empty;
+
+        newControl.TimeLapseStartsOnEntry.PropertyChanged += (sender, args) =>
+        {
+            if (args.PropertyName == nameof(ConversionDataEntryContext<DateTime?>.UserValue))
+                newControl.StatusContext.RunNonBlockingTask(newControl.UpdateSelectedPhotos);
+        };
+
+        newControl.TimeLapseEndsOnEntry.PropertyChanged += (sender, args) =>
+        {
+            if (args.PropertyName == nameof(ConversionDataEntryContext<DateTime?>.UserValue))
+                newControl.StatusContext.RunNonBlockingTask(newControl.UpdateSelectedPhotos);
+        };
+
+        return newControl;
     }
 
     private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -64,7 +99,8 @@ public partial class TimelapseGeneratorContext
     private async Task UpdateSourcePhotoInformation()
     {
         await ThreadSwitcher.ResumeForegroundAsync();
-        SourcePhotoInformation.Clear();
+        SourcePhotos.Clear();
+        SelectedPhotos.Clear();
         CameraItems.Clear();
         TimeDescriptionItems.Clear();
 
@@ -101,9 +137,67 @@ public partial class TimelapseGeneratorContext
         await ThreadSwitcher.ResumeForegroundAsync();
 
         var defaultCameraOrder = 0;
-        cameras.ForEach(x => CameraItems.Add(new CameraListItem { CameraName = x, Order = defaultCameraOrder++ }));
-        timeDescriptions.ForEach(x => TimeDescriptionItems.Add(new TimeDescriptionListItem { TimeDescription = x }));
-        sourcePhotos.ForEach(x => SourcePhotoInformation.Add(x));
+        cameras.ForEach(x => CameraItems.Add(new CameraListItem
+        {
+            CameraName = x, PhotoCount = sourcePhotos.Count(y => y.Camera.Equals(x)), Order = defaultCameraOrder++,
+            StartsOn = sourcePhotos.Where(y => y.Camera.Equals(x)).MinBy(y => y.TakenOn)?.TakenOn,
+            EndsOn = sourcePhotos.Where(y => y.Camera.Equals(x)).MaxBy(y => y.TakenOn)?.TakenOn
+        }));
+
+        foreach (var loopCameraItems in CameraItems)
+            loopCameraItems.PropertyChanged += (sender, args) =>
+            {
+                if (args.PropertyName == nameof(CameraListItem.Selected))
+                    StatusContext.RunNonBlockingTask(UpdateSelectedPhotos);
+            };
+
+        timeDescriptions.ForEach(x => TimeDescriptionItems.Add(new TimeDescriptionListItem
+        {
+            TimeDescription = x, PhotoCount = sourcePhotos.Count(y => y.Description.Equals(x)),
+            StartsOn = sourcePhotos.Where(y => y.Description.Equals(x)).MinBy(y => y.TakenOn)?.TakenOn,
+            EndsOn = sourcePhotos.Where(y => y.Description.Equals(x)).MaxBy(y => y.TakenOn)?.TakenOn
+        }));
+
+        foreach (var loopDescriptions in TimeDescriptionItems)
+            loopDescriptions.PropertyChanged += (sender, args) =>
+            {
+                if (args.PropertyName == nameof(CameraListItem.Selected))
+                    StatusContext.RunNonBlockingTask(UpdateSelectedPhotos);
+            };
+
+        sourcePhotos.ForEach(x => SourcePhotos.Add(x));
+
+        NumberOfSelectedPhotos = 0;
+        SelectedPhotosStartOn = null;
+        SelectedPhotosEndOn = null;
+    }
+
+    private async Task UpdateSelectedPhotos()
+    {
+        await ThreadSwitcher.ResumeBackgroundAsync();
+
+        var selectedCameraNames = SelectedCameraItems().Select(x => x.CameraName).ToList();
+        var selectedTimeDescriptionNames = SelectedTimeDescriptionItems().Select(x => x.TimeDescription).ToList();
+
+        var selectedPhotos = SourcePhotos.Where(x =>
+            selectedCameraNames.Contains(x.Camera) &&
+            selectedTimeDescriptionNames.Contains(x.Description)).ToList();
+
+        if (TimeLapseStartsOnEntry is { HasValidationIssues: false, UserValue: not null })
+            selectedPhotos = selectedPhotos.Where(x => x.TakenOn >= TimeLapseStartsOnEntry.UserValue.Value).ToList();
+
+        if (TimeLapseEndsOnEntry is { HasValidationIssues: false, UserValue: not null })
+            selectedPhotos = selectedPhotos.Where(x => x.TakenOn <= TimeLapseEndsOnEntry.UserValue.Value).ToList();
+
+        NumberOfSelectedPhotos = selectedPhotos.Count;
+        SelectedPhotosStartOn = selectedPhotos.MinBy(x => x.TakenOn)?.TakenOn;
+        SelectedPhotosEndOn = selectedPhotos.MaxBy(x => x.TakenOn)?.TakenOn;
+
+        await ThreadSwitcher.ResumeForegroundAsync();
+
+        SelectedPhotos.Clear();
+        selectedPhotos.OrderBy(x => x.TakenOn).ThenBy(x => x.Camera).ThenBy(x => x.Description).ToList()
+            .ForEach(x => SelectedPhotos.Add(x));
     }
 
     [BlockingCommand]
@@ -142,25 +236,40 @@ public partial class TimelapseGeneratorContext
         SourceFolder = selectedDirectory.FullName;
     }
 
+    public List<CameraListItem> SelectedCameraItems()
+    {
+        if (!CameraItems.Any()) return new List<CameraListItem>();
+
+        return CameraItems.Where(x => x.Selected).ToList();
+    }
+
+    public List<TimeDescriptionListItem> SelectedTimeDescriptionItems()
+    {
+        if (!TimeDescriptionItems.Any()) return new List<TimeDescriptionListItem>();
+
+        return TimeDescriptionItems.Where(x => x.Selected).ToList();
+    }
+
+
     [BlockingCommand]
     public async Task CreateTimelapse()
     {
         await ThreadSwitcher.ResumeBackgroundAsync();
 
-        if (SelectedCameraItems.Count == 0)
+        if (SelectedCameraItems().Count == 0)
         {
             StatusContext.ToastWarning("No Cameras Selected?");
             return;
         }
 
-        if (SelectedTimeDescriptionItems.Count == 0)
+        if (SelectedTimeDescriptionItems().Count == 0)
         {
             StatusContext.ToastWarning("No Time Descriptions Selected?");
             return;
         }
 
-        var selectedCameraNames = SelectedCameraItems.Select(x => x.CameraName).ToList();
-        var selectedTimeDescriptions = SelectedTimeDescriptionItems.Select(x => x.TimeDescription).ToList();
+        var selectedCameraNames = SelectedCameraItems().Select(x => x.CameraName).ToList();
+        var selectedTimeDescriptions = SelectedTimeDescriptionItems().Select(x => x.TimeDescription).ToList();
 
         var timeDescriptionGroups = new List<TimeDescriptionGroup>();
 
@@ -169,7 +278,8 @@ public partial class TimelapseGeneratorContext
             var group = new TimeDescriptionGroup { TimeDescription = loopDescription };
             timeDescriptionGroups.Add(group);
 
-            var relatedPhotos = SourcePhotoInformation.Where(x => x.Description == loopDescription).ToList();
+            var relatedPhotos = SourcePhotos
+                .Where(x => x.Description == loopDescription && selectedCameraNames.Contains(x.Camera)).ToList();
 
             foreach (var photo in relatedPhotos)
             {
@@ -212,11 +322,27 @@ public partial class TimelapseGeneratorContext
                 ? "ffmpeg"
                 : Path.Combine(ffmpegDirectory, "ffmpeg.exe");
 
-            var command =
-                $"-framerate {FrameRate} -i z_timelapse--%06d.jpg -r 30 Timelapse-Created {DateTime.Now:yyyy-MM-dd HH-mm}.mp4";
+            var resultFile = $"Timelapse-Created-{DateTime.Now:yyyy-MM-dd HH-mm}.mp4";
 
-            await ProcessTools.Execute(ffmpegExe, command, tempStorageDirectory.FullName,
-                StatusContext.ProgressTracker());
+            var command =
+                $"""
+                 cd '{tempStorageDirectory.FullName}'
+                 {ffmpegExe} -framerate {FrameRate} -i z_timelapse--%06d.jpg -r 30 '{resultFile}'
+                 """;
+
+            var runResult = await PowerShellRun.ExecuteScript(command, StatusContext.ProgressTracker());
+
+            if (runResult.Item1)
+            {
+                await StatusContext.ShowMessageWithOkButton($"Error Creating Timelapse",
+                    string.Join(Environment.NewLine, runResult.runLog));
+                return;
+            }
+
+            var argument = $"/select, \"{resultFile}\"";
+
+            await ThreadSwitcher.ResumeForegroundAsync();
+            Process.Start("explorer.exe", argument);
         }
     }
 
