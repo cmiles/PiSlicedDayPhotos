@@ -1,4 +1,5 @@
-﻿using PiSlicedDayPhotos.TimelapseHelperGui.Controls;
+﻿using Metalama.Patterns.Observability;
+using PiSlicedDayPhotos.TimelapseHelperGui.Controls;
 using PointlessWaymarks.CommonTools;
 using PointlessWaymarks.LlamaAspects;
 using PointlessWaymarks.WpfCommon.ProgramUpdateMessage;
@@ -11,7 +12,7 @@ namespace PiSlicedDayPhotos.TimelapseHelperGui;
 /// <summary>
 ///     Interaction logic for MainWindow.xaml
 /// </summary>
-[NotifyPropertyChanged]
+[Observable]
 [GenerateStatusCommands]
 public partial class MainWindow
 {

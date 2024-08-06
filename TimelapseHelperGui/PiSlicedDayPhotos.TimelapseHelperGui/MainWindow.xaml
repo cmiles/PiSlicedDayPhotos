@@ -28,7 +28,7 @@
         <windowScreenShot:WindowScreenShotControl
             Margin="2,2,2,6"
             Width="40"
-            HorizontalAlignment="Left"
+            HorizontalAlignment="Right"
             VerticalAlignment="Bottom" />
     </Grid>
 </Window>

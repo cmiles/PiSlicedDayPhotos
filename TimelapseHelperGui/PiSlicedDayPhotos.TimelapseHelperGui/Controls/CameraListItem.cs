@@ -1,13 +1,12 @@
-﻿using PointlessWaymarks.LlamaAspects;
+﻿using Metalama.Patterns.Observability;
 
 namespace PiSlicedDayPhotos.TimelapseHelperGui.Controls;
 
-[NotifyPropertyChanged]
+[Observable]
 public partial class CameraListItem
 {
     public bool Selected { get; set; }
     public string CameraName { get; set; } = "(None)";
-    public required int Order { get; set; }
     public int PhotoCount { get; set; }
     public DateTime? StartsOn { get; set; }
     public DateTime? EndsOn { get; set; }

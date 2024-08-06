@@ -1,8 +1,8 @@
-﻿using PointlessWaymarks.LlamaAspects;
+﻿using Metalama.Patterns.Observability;
 
 namespace PiSlicedDayPhotos.TimelapseHelperGui.Controls;
 
-[NotifyPropertyChanged]
+[Observable]
 public partial class TimeDescriptionListItem
 {
     public bool Selected { get; set; }

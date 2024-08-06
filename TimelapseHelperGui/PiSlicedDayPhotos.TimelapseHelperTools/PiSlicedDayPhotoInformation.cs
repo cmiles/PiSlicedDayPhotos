@@ -1,4 +1,4 @@
-﻿namespace PiSlicedDayPhotos.TimelapseHelperGui.Controls;
+﻿namespace PiSlicedDayPhotos.TimelapseHelperTools;
 
 public class PiSlicedDayPhotoInformation
 {
@@ -6,4 +6,6 @@ public class PiSlicedDayPhotoInformation
     public required DateTime TakenOn { get; set; }
     public required string Camera { get; set; }
     public required string Description { get; set; }
+    public required int Width { get; set; }
+    public required int Height { get; set; }
 }

@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PointlessWaymarks.CommonTools;
+﻿using PointlessWaymarks.CommonTools;
+using System.Diagnostics;
 
-namespace PiSlicedDayPhotos.TimelapseHelperGui
+namespace PiSlicedDayPhotos.TimelapseHelperTools
 {
-    public static class FileHelpers
+    public static class FileLocationTools
     {
         public static DirectoryInfo DefaultStorageDirectory()
         {

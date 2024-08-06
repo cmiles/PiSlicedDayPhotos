@@ -1,17 +1,20 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
+using Metalama.Patterns.Observability;
 using Ookii.Dialogs.Wpf;
+using PiSlicedDayPhotos.TimelapseHelperTools;
 using PointlessWaymarks.LlamaAspects;
 using PointlessWaymarks.WpfCommon;
+using PointlessWaymarks.WpfCommon.BoolDataEntry;
 using PointlessWaymarks.WpfCommon.ConversionDataEntry;
 using PointlessWaymarks.WpfCommon.Status;
+using PointlessWaymarks.WpfCommon.StringDataEntry;
 
 namespace PiSlicedDayPhotos.TimelapseHelperGui.Controls;
 
-[NotifyPropertyChanged]
+[Observable]
 [GenerateStatusCommands]
 public partial class TimelapseGeneratorContext
 {
@@ -20,21 +23,21 @@ public partial class TimelapseGeneratorContext
         PropertyChanged += OnPropertyChanged;
     }
 
-    public bool CameraCombinedMode { get; set; }
-    public bool SliceCombinedMode { get; set; }
     public required ObservableCollection<PiSlicedDayPhotoInformation> SourcePhotos { get; set; }
     public required ObservableCollection<PiSlicedDayPhotoInformation> SelectedPhotos { get; set; }
     public required ObservableCollection<CameraListItem> CameraItems { get; set; }
     public required ObservableCollection<TimeDescriptionListItem> TimeDescriptionItems { get; set; }
     public required StatusControlContext StatusContext { get; set; }
     public string SourceFolder { get; set; } = string.Empty;
-    public int FrameRate { get; set; } = 6;
     public int NumberOfSelectedPhotos { get; set; }
     public DateTime? SelectedPhotosStartOn { get; set; }
     public DateTime? SelectedPhotosEndOn { get; set; }
-
-    public required ConversionDataEntryContext<DateTime?> TimeLapseStartsOnEntry { get; set; }
-    public required ConversionDataEntryContext<DateTime?> TimeLapseEndsOnEntry { get; set; }
+    public required BoolDataEntryContext WriteCaptionDataEntry { get; set; }
+    public required StringDataEntryContext CaptionFormatEntry { get; set; }
+    public required ConversionDataEntryNoChangeIndicatorContext<int> FrameRateDataEntry { get; set; }
+    public required ConversionDataEntryNoChangeIndicatorContext<int> CaptionFontSizeEntry { get; set; }
+    public required ConversionDataEntryNoChangeIndicatorContext<DateTime?> TimeLapseStartsOnEntry { get; set; }
+    public required ConversionDataEntryNoChangeIndicatorContext<DateTime?> TimeLapseEndsOnEntry { get; set; }
 
     public static async Task<TimelapseGeneratorContext> CreateInstance(StatusControlContext statusContext)
     {
@@ -45,16 +48,42 @@ public partial class TimelapseGeneratorContext
         var factorySelectedPhotos = new ObservableCollection<PiSlicedDayPhotoInformation>();
 
         var factoryStartsOnEntry =
-            await ConversionDataEntryContext<DateTime?>.CreateInstance(ConversionDataEntryHelpers
+            await ConversionDataEntryNoChangeIndicatorContext<DateTime?>.CreateInstance(ConversionDataEntryHelpers
                 .DateTimeNullableConversion);
         factoryStartsOnEntry.Title = "Photos After - Blank will start with the Earliest Possible Photo";
         factoryStartsOnEntry.HelpText = "Only include photos taken on or after this date.";
 
         var factoryEndsOnEntry =
-            await ConversionDataEntryContext<DateTime?>.CreateInstance(ConversionDataEntryHelpers
+            await ConversionDataEntryNoChangeIndicatorContext<DateTime?>.CreateInstance(ConversionDataEntryHelpers
                 .DateTimeNullableConversion);
         factoryEndsOnEntry.Title = "Photos Before - Blank will start with the Last Possible Photo";
         factoryEndsOnEntry.HelpText = "Only include photos taken on or before this date.";
+
+        var factoryFrameRateEntry = await ConversionDataEntryNoChangeIndicatorContext<int>.CreateInstance(
+            ConversionDataEntryHelpers
+                .IntConversion);
+        factoryFrameRateEntry.Title = "Frame Rate";
+        factoryFrameRateEntry.HelpText = "Frames per Second for the Timelapse";
+        factoryFrameRateEntry.UserText = "6";
+
+        var factoryCaptionFontSizeEntry = await ConversionDataEntryNoChangeIndicatorContext<int>.CreateInstance(
+            ConversionDataEntryHelpers
+                .IntConversion);
+        factoryCaptionFontSizeEntry.Title = "Caption Font Size";
+        factoryCaptionFontSizeEntry.HelpText = "Font Size for the Caption";
+        factoryCaptionFontSizeEntry.UserText = "36";
+
+        var factoryWriteCaptionEntry = await BoolDataEntryContext.CreateInstance();
+        factoryWriteCaptionEntry.Title = "Write Caption";
+        factoryWriteCaptionEntry.HelpText =
+            "If checked a caption with the photo date will be added to the image/timelapse - use the Caption format string to control what is written.";
+        factoryWriteCaptionEntry.UserValue = true;
+
+        var factoryCaptionFormatEntry = StringDataEntryContext.CreateInstance();
+        factoryCaptionFormatEntry.Title = "Caption Format";
+        factoryCaptionFormatEntry.HelpText =
+            "A string that will be used to format the photo datetime for the caption.";
+        factoryCaptionFormatEntry.UserValue = "yyyy MMMM";
 
         var newControl = new TimelapseGeneratorContext
         {
@@ -64,7 +93,11 @@ public partial class TimelapseGeneratorContext
             SelectedPhotos = factorySelectedPhotos,
             StatusContext = statusContext,
             TimeLapseStartsOnEntry = factoryStartsOnEntry,
-            TimeLapseEndsOnEntry = factoryEndsOnEntry
+            TimeLapseEndsOnEntry = factoryEndsOnEntry,
+            FrameRateDataEntry = factoryFrameRateEntry,
+            CaptionFormatEntry = factoryCaptionFormatEntry,
+            WriteCaptionDataEntry = factoryWriteCaptionEntry,
+            CaptionFontSizeEntry = factoryCaptionFontSizeEntry
         };
 
         await ThreadSwitcher.ResumeBackgroundAsync();
@@ -108,38 +141,16 @@ public partial class TimelapseGeneratorContext
 
         await ThreadSwitcher.ResumeBackgroundAsync();
 
-        var sourceDirectory = new DirectoryInfo(SourceFolder);
-
-        var allImages = sourceDirectory.EnumerateFiles("*--*.jpg").ToList();
-
-        var sourcePhotos = new List<PiSlicedDayPhotoInformation>();
-
-        foreach (var loopImage in allImages)
-        {
-            var initialSplit = Path.GetFileNameWithoutExtension(loopImage.FullName).Split("--");
-
-            var dateString = initialSplit[0].Substring(0, 16);
-            var descriptionString = initialSplit[0].Substring(17, initialSplit[0].Length - 17);
-            var cameraString = initialSplit[1];
-
-            sourcePhotos.Add(new PiSlicedDayPhotoInformation
-            {
-                FileName = loopImage.FullName,
-                TakenOn = DateTime.ParseExact(dateString, "yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture),
-                Camera = cameraString,
-                Description = descriptionString
-            });
-        }
+        var sourcePhotos = PiSlicedDayPhotoTools.ProcessDirectory(SourceFolder, StatusContext.ProgressTracker());
 
         var cameras = sourcePhotos.Select(x => x.Camera).Distinct().OrderBy(x => x).ToList();
         var timeDescriptions = sourcePhotos.Select(x => x.Description).Distinct().OrderBy(x => x).ToList();
 
         await ThreadSwitcher.ResumeForegroundAsync();
 
-        var defaultCameraOrder = 0;
         cameras.ForEach(x => CameraItems.Add(new CameraListItem
         {
-            CameraName = x, PhotoCount = sourcePhotos.Count(y => y.Camera.Equals(x)), Order = defaultCameraOrder++,
+            CameraName = x, PhotoCount = sourcePhotos.Count(y => y.Camera.Equals(x)),
             StartsOn = sourcePhotos.Where(y => y.Camera.Equals(x)).MinBy(y => y.TakenOn)?.TakenOn,
             EndsOn = sourcePhotos.Where(y => y.Camera.Equals(x)).MaxBy(y => y.TakenOn)?.TakenOn
         }));
@@ -162,7 +173,14 @@ public partial class TimelapseGeneratorContext
             loopDescriptions.PropertyChanged += (sender, args) =>
             {
                 if (args.PropertyName == nameof(CameraListItem.Selected))
+                {
+                    //Set other TimeDescription items to Selected = false
+                    if (loopDescriptions.Selected)
+                        foreach (var loopTimeDescriptionItems in TimeDescriptionItems)
+                            if (loopTimeDescriptionItems != loopDescriptions)
+                                loopTimeDescriptionItems.Selected = false;
                     StatusContext.RunNonBlockingTask(UpdateSelectedPhotos);
+                }
             };
 
         sourcePhotos.ForEach(x => SourcePhotos.Add(x));
@@ -250,7 +268,6 @@ public partial class TimelapseGeneratorContext
         return TimeDescriptionItems.Where(x => x.Selected).ToList();
     }
 
-
     [BlockingCommand]
     public async Task CreateTimelapse()
     {
@@ -258,105 +275,84 @@ public partial class TimelapseGeneratorContext
 
         if (SelectedCameraItems().Count == 0)
         {
-            StatusContext.ToastWarning("No Cameras Selected?");
+            StatusContext.ToastError("No Cameras Selected?");
             return;
         }
 
         if (SelectedTimeDescriptionItems().Count == 0)
         {
-            StatusContext.ToastWarning("No Time Descriptions Selected?");
+            StatusContext.ToastError("No Time Descriptions Selected?");
+            return;
+        }
+
+        if (SelectedTimeDescriptionItems().Count > 1)
+        {
+            StatusContext.ToastError("Please select a single Time Description");
+            return;
+        }
+
+        if (FrameRateDataEntry.HasValidationIssues)
+        {
+            StatusContext.ToastError("Frame Rate Entry Issues?");
+            return;
+        }
+
+        var settings = TimelapseHelperGuiSettingsTools.ReadSettings();
+
+        var ffmpegDirectory = string.IsNullOrWhiteSpace(settings.FfmpegExecutableDirectory) ||
+                              !Directory.Exists(settings.FfmpegExecutableDirectory)
+            ? string.Empty
+            : settings.FfmpegExecutableDirectory;
+        var ffmpegExe = string.IsNullOrWhiteSpace(ffmpegDirectory)
+            ? "ffmpeg"
+            : Path.Combine(ffmpegDirectory, "ffmpeg.exe");
+
+        if (!File.Exists(ffmpegExe))
+        {
+            StatusContext.ToastError("FFMPEG Executable Not Found?");
             return;
         }
 
         var selectedCameraNames = SelectedCameraItems().Select(x => x.CameraName).ToList();
         var selectedTimeDescriptions = SelectedTimeDescriptionItems().Select(x => x.TimeDescription).ToList();
 
-        var timeDescriptionGroups = new List<TimeDescriptionGroup>();
+        StatusContext.Progress($"Cameras: {string.Join(", ", selectedCameraNames)}");
+        StatusContext.Progress($"Time Descriptions: {string.Join(", ", selectedTimeDescriptions)}");
 
-        foreach (var loopDescription in selectedTimeDescriptions)
+        var cameraOrder = new Dictionary<string, int>();
+
+        foreach (var loopSelectedCameraNames in selectedCameraNames)
+            cameraOrder.Add(loopSelectedCameraNames,
+                CameraItems.IndexOf(CameraItems.First(x => x.CameraName == loopSelectedCameraNames)));
+
+        var result = await PiSlicedDayPhotoTools.CreateSingleTimeDescriptionTimelapse(SelectedPhotos.ToList(),
+            FrameRateDataEntry.UserValue, cameraOrder, ffmpegExe, StatusContext.ProgressTracker(),
+            WriteCaptionDataEntry.UserValue, CaptionFormatEntry.UserValue, CaptionFontSizeEntry.UserValue);
+
+        if (File.Exists(result.resultFile))
         {
-            var group = new TimeDescriptionGroup { TimeDescription = loopDescription };
-            timeDescriptionGroups.Add(group);
-
-            var relatedPhotos = SourcePhotos
-                .Where(x => x.Description == loopDescription && selectedCameraNames.Contains(x.Camera)).ToList();
-
-            foreach (var photo in relatedPhotos)
-            {
-                var existingSet = group.PhotoSets.FirstOrDefault(x =>
-                    Math.Abs(x.ReferenceDateTime.Subtract(photo.TakenOn.Date).TotalMinutes) <= 2);
-
-                if (existingSet == null)
-                {
-                    existingSet = new TimeDescriptionPhotoSet { ReferenceDateTime = photo.TakenOn.Date };
-                    group.PhotoSets.Add(existingSet);
-                }
-
-                existingSet.Photos.Add(photo);
-            }
+            await OpenExplorerWindowForFile(result.resultFile);
         }
 
-        var cameraOrderLookup = CameraItems.ToDictionary(x => x.CameraName, x => x.Order);
+        if (result.errors)
+            await StatusContext.ShowMessageWithOkButton("Error Creating Timelapse",
+                string.Join(Environment.NewLine, result.runLog));
+    }
 
-        if ((!CameraCombinedMode && !SliceCombinedMode) ||
-            (selectedCameraNames.Count == 1 && selectedTimeDescriptions.Count == 1))
+    public static async Task OpenExplorerWindowForFile(string fileName)
+    {
+        if (!File.Exists(fileName)) return;
+        //Clean up file path so it can be navigated OK
+        var cleanedPath = Path.GetFullPath(fileName);
+
+        await ThreadSwitcher.ResumeForegroundAsync();
+
+        var ps = new ProcessStartInfo("explorer.exe", $"/select, \"{cleanedPath}\"")
         {
-            var orderedPhotos = timeDescriptionGroups.SelectMany(x => x.PhotoSets).OrderBy(x => x.ReferenceDateTime)
-                .SelectMany(x => x.Photos.OrderBy(y => cameraOrderLookup[y.Camera]).Select(y => y)).ToList();
+            UseShellExecute = true,
+            Verb = "open"
+        };
 
-            var tempStorageDirectory = FileHelpers.UniqueTimeLapseStorageDirectory();
-
-            var counter = 1;
-
-            foreach (var loopTimelapsePhotos in orderedPhotos)
-                File.Copy(loopTimelapsePhotos.FileName,
-                    Path.Combine(tempStorageDirectory.FullName, $"z_timelapse--{counter++:D6}.jpg"));
-
-            var settings = TimelapseHelperGuiSettingsTools.ReadSettings();
-
-            var ffmpegDirectory = string.IsNullOrWhiteSpace(settings.FfmpegExecutableDirectory) ||
-                                  !Directory.Exists(settings.FfmpegExecutableDirectory)
-                ? string.Empty
-                : settings.FfmpegExecutableDirectory;
-            var ffmpegExe = string.IsNullOrWhiteSpace(ffmpegDirectory)
-                ? "ffmpeg"
-                : Path.Combine(ffmpegDirectory, "ffmpeg.exe");
-
-            var resultFile = $"Timelapse-Created-{DateTime.Now:yyyy-MM-dd HH-mm}.mp4";
-
-            var command =
-                $"""
-                 cd '{tempStorageDirectory.FullName}'
-                 {ffmpegExe} -framerate {FrameRate} -i z_timelapse--%06d.jpg -r 30 '{resultFile}'
-                 """;
-
-            var runResult = await PowerShellRun.ExecuteScript(command, StatusContext.ProgressTracker());
-
-            if (runResult.Item1)
-            {
-                await StatusContext.ShowMessageWithOkButton($"Error Creating Timelapse",
-                    string.Join(Environment.NewLine, runResult.runLog));
-                return;
-            }
-
-            var argument = $"/select, \"{resultFile}\"";
-
-            await ThreadSwitcher.ResumeForegroundAsync();
-            Process.Start("explorer.exe", argument);
-        }
-    }
-
-    public class TimeDescriptionGroup
-    {
-        public required string TimeDescription { get; set; }
-
-        public List<TimeDescriptionPhotoSet> PhotoSets { get; set; } = [];
-    }
-
-    public class TimeDescriptionPhotoSet
-    {
-        public required DateTime ReferenceDateTime { get; set; }
-
-        public List<PiSlicedDayPhotoInformation> Photos { get; set; } = [];
+        Process.Start(ps);
     }
 }

@@ -1,8 +1,9 @@
+using Metalama.Patterns.Observability;
 using PointlessWaymarks.LlamaAspects;
 
 namespace PiSlicedDayPhotos.TimelapseHelperGui;
 
-[NotifyPropertyChanged]
+[Observable]
 public partial class TimelapseHelperGuiSettings
 {
     public string? LastInputDirectory { get; set; } = string.Empty;

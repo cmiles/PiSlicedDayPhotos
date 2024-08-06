@@ -3,11 +3,12 @@ using System.Collections.ObjectModel;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 
-namespace PiSlicedDayPhotos.TimelapseHelperGui.Controls;
+namespace PiSlicedDayPhotos.TimelapseHelperTools;
 
 public static class PowerShellRun
 {
-    public static async Task<(bool errors, List<string> runLog)> ExecuteScript(string scriptToRun,
+    public static async Task<(bool fatalErrors, bool nonTerminalErrors, List<string> runLog)> ExecuteScript(
+        string scriptToRun,
         IProgress<string>? progress)
     {
         var initialSessionState = InitialSessionState.CreateDefault();
@@ -21,7 +22,8 @@ public static class PowerShellRun
         // create Powershell runspace
         var runSpace = RunspaceFactory.CreateRunspace(initialSessionState);
 
-        // open it
+        // open it - This has an async version, but it isn't awaitable 
+        // ReSharper disable once MethodHasAsyncOverload
         runSpace.Open();
 
         // create a pipeline and feed it the script text
@@ -29,9 +31,7 @@ public static class PowerShellRun
         pipeline.Commands.AddScript(scriptToRun);
         pipeline.Input.Close();
 
-
         var returnLog = new ConcurrentBag<(DateTime, string)>();
-        var errorData = false;
 
         pipeline.Output.DataReady += (_, _) =>
         {
@@ -57,7 +57,7 @@ public static class PowerShellRun
             Collection<object> errorObjects = pipeline.Error.NonBlockingRead();
             if (errorObjects.Count == 0) return;
 
-            errorData = true;
+            _ = true;
             foreach (var errorObject in errorObjects)
             {
                 var errorString = errorObject.ToString();
@@ -66,14 +66,21 @@ public static class PowerShellRun
                     progress?.Report(errorString);
             }
         };
-        pipeline.InvokeAsync();
 
-        await Task.Delay(200);
+        try
+        {
+            pipeline.InvokeAsync();
 
-        while (pipeline.PipelineStateInfo.State == PipelineState.Running) await Task.Delay(250);
+            await Task.Delay(200);
 
-        return (errorData || pipeline.HadErrors, returnLog.OrderBy(x => x.Item1).Select(x => x.Item2).ToList());
+            while (pipeline.PipelineStateInfo.State == PipelineState.Running) await Task.Delay(250);
+        }
+        catch (Exception e)
+        {
+            return (true, pipeline.HadErrors, returnLog.OrderBy(x => x.Item1).Select(x => x.Item2).ToList());
+        }
 
-        //TODO: Error return handling
+
+        return (false, pipeline.HadErrors, returnLog.OrderBy(x => x.Item1).Select(x => x.Item2).ToList());
     }
 }

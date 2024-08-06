@@ -17,10 +17,12 @@
     </PackageReference>
     <PackageReference Include="Jot" Version="2.1.17" />
     <PackageReference Include="Metalama.Framework" Version="2024.2.19" />
+    <PackageReference Include="Metalama.Patterns.Observability" Version="2024.2.19" />
     <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.4.4" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PiSlicedDayPhotos.TimelapseHelperTools\PiSlicedDayPhotos.TimelapseHelperTools.csproj" />
     <ProjectReference Include="..\PointlessWaymarksTools\PointlessWaymarks.LlamaAspects\PointlessWaymarks.LlamaAspects.csproj" />
     <ProjectReference Include="..\PointlessWaymarksTools\PointlessWaymarks.WpfCommon\PointlessWaymarks.WpfCommon.csproj" />
   </ItemGroup>
