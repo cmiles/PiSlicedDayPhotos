@@ -16,9 +16,9 @@ namespace PiSlicedDayPhotos.TimelapseHelperGui.Controls;
 
 [Observable]
 [GenerateStatusCommands]
-public partial class TimelapseGeneratorContext
+public partial class TimelapseSingleTimeDescriptionGeneratorContext
 {
-    public TimelapseGeneratorContext()
+    public TimelapseSingleTimeDescriptionGeneratorContext()
     {
         PropertyChanged += OnPropertyChanged;
     }
@@ -38,8 +38,9 @@ public partial class TimelapseGeneratorContext
     public required ConversionDataEntryNoChangeIndicatorContext<int> CaptionFontSizeEntry { get; set; }
     public required ConversionDataEntryNoChangeIndicatorContext<DateTime?> TimeLapseStartsOnEntry { get; set; }
     public required ConversionDataEntryNoChangeIndicatorContext<DateTime?> TimeLapseEndsOnEntry { get; set; }
+    public string? CaptionFormatSample { get; set; } = string.Empty;
 
-    public static async Task<TimelapseGeneratorContext> CreateInstance(StatusControlContext statusContext)
+    public static async Task<TimelapseSingleTimeDescriptionGeneratorContext> CreateInstance(StatusControlContext statusContext)
     {
         await ThreadSwitcher.ResumeForegroundAsync();
         var factorySeriesItems = new ObservableCollection<SeriesListItem>();
@@ -85,7 +86,7 @@ public partial class TimelapseGeneratorContext
             "A string that will be used to format the photo datetime for the caption.";
         factoryCaptionFormatEntry.UserValue = "yyyy MMMM";
 
-        var newControl = new TimelapseGeneratorContext
+        var newControl = new TimelapseSingleTimeDescriptionGeneratorContext
         {
             SeriesItems = factorySeriesItems,
             TimeDescriptionItems = factoryTimeDescriptionItems,
@@ -118,7 +119,31 @@ public partial class TimelapseGeneratorContext
                 newControl.StatusContext.RunNonBlockingTask(newControl.UpdateSelectedPhotos);
         };
 
+        newControl.CaptionFormatEntry.PropertyChanged += (sender, args) =>
+        {
+            if (args.PropertyName == nameof(StringDataEntryContext.UserValue))
+                newControl.StatusContext.RunNonBlockingTask(newControl.UpdateCaptionFormatSample);
+        };
+
+        newControl.StatusContext.RunFireAndForgetNonBlockingTask(newControl.UpdateCaptionFormatSample);
+
         return newControl;
+    }
+
+    private async Task UpdateCaptionFormatSample()
+    {
+        await ThreadSwitcher.ResumeBackgroundAsync();
+
+        var captionFormat = CaptionFormatEntry.UserValue;
+
+        try
+        {
+            CaptionFormatSample = DateTime.Now.ToString(captionFormat);
+        }
+        catch (Exception e)
+        {
+            CaptionFormatSample = "(Error in Format!)";
+        }
     }
 
     private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)

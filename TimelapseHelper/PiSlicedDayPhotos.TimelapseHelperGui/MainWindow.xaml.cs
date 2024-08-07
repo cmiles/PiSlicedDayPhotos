@@ -47,17 +47,16 @@ public partial class MainWindow
         StatusContext.RunFireAndForgetBlockingTask(Setup);
     }
 
-    public object TimelapseContext { get; set; }
-
+    public TimelapseSingleTimeDescriptionGeneratorContext? TimelapseContext { get; set; }
+    public AppSettingsContext? SettingsContext { get; set; }
     public ProgramUpdateMessageContext UpdateMessageContext { get; set; }
-
     public StatusControlContext StatusContext { get; set; }
-
     public string InfoTitle { get; set; }
 
     private async Task Setup()
     {
-        TimelapseContext = await TimelapseGeneratorContext.CreateInstance(StatusContext);
+        TimelapseContext = await TimelapseSingleTimeDescriptionGeneratorContext.CreateInstance(StatusContext);
+        SettingsContext = await AppSettingsContext.CreateInstance(StatusContext);
     }
 
     public async Task CheckForProgramUpdate(string currentDateVersion)
