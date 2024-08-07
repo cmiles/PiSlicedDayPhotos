@@ -1,0 +1,3 @@
+[submodule "TimelapseHelper/PointlessWaymarksTools"]
+	path = TimelapseHelper/PointlessWaymarksTools
+	url = https://github.com/cmiles/PointlessWaymarksTools.git

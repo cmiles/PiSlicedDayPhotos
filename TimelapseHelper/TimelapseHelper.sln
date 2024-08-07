@@ -22,6 +22,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PiSlicedDayPhotos.Timelapse
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PiSlicedDayPhotos.TimelapseHelper", "PiSlicedDayPhotos.TimelapseHelper\PiSlicedDayPhotos.TimelapseHelper.csproj", "{AE3EEBC3-B465-4818-8CD0-20842CF7FF3D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PointlessWaymarks.SpatialTools", "PointlessWaymarksTools\PointlessWaymarks.SpatialTools\PointlessWaymarks.SpatialTools.csproj", "{7385B721-CC58-44CC-B317-BE51895F562D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,6 +80,14 @@ Global
 		{AE3EEBC3-B465-4818-8CD0-20842CF7FF3D}.Release|Any CPU.Build.0 = Release|x64
 		{AE3EEBC3-B465-4818-8CD0-20842CF7FF3D}.Release|x64.ActiveCfg = Release|x64
 		{AE3EEBC3-B465-4818-8CD0-20842CF7FF3D}.Release|x64.Build.0 = Release|x64
+		{7385B721-CC58-44CC-B317-BE51895F562D}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{7385B721-CC58-44CC-B317-BE51895F562D}.Debug|Any CPU.Build.0 = Debug|x64
+		{7385B721-CC58-44CC-B317-BE51895F562D}.Debug|x64.ActiveCfg = Debug|x64
+		{7385B721-CC58-44CC-B317-BE51895F562D}.Debug|x64.Build.0 = Debug|x64
+		{7385B721-CC58-44CC-B317-BE51895F562D}.Release|Any CPU.ActiveCfg = Release|x64
+		{7385B721-CC58-44CC-B317-BE51895F562D}.Release|Any CPU.Build.0 = Release|x64
+		{7385B721-CC58-44CC-B317-BE51895F562D}.Release|x64.ActiveCfg = Release|x64
+		{7385B721-CC58-44CC-B317-BE51895F562D}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -86,6 +96,7 @@ Global
 		{C6C21B0F-CAC1-4E78-AB35-C132C0924733} = {31C1649D-8FE8-4866-808E-267EF30EF5F9}
 		{07418B9D-F078-4711-A43E-A6556AE7D2FD} = {31C1649D-8FE8-4866-808E-267EF30EF5F9}
 		{AABF5545-4DF2-496A-B7F5-A0C0B92A74A7} = {31C1649D-8FE8-4866-808E-267EF30EF5F9}
+		{7385B721-CC58-44CC-B317-BE51895F562D} = {31C1649D-8FE8-4866-808E-267EF30EF5F9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {473A027D-6AE7-45B0-8B01-930819381372}
