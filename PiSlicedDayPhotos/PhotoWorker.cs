@@ -13,7 +13,7 @@ public class PhotoWorker : BackgroundService
     private string ErrorImageFileName(PiSlicedDaySettings userSettings)
     {
         return Path.Combine(userSettings.PhotoStorageDirectory,
-            $"{DateTime.Now:yyyy-MM-dd-HH-mm-ss}-Error{(string.IsNullOrWhiteSpace(userSettings.PhotoNamePostfix) ? "" : "-")}{userSettings.PhotoNamePostfix}.jpg");
+            $"{DateTime.Now:yyyy-MM-dd-HH-mm-ss}-Error{(string.IsNullOrWhiteSpace(userSettings.PhotoSeriesName) ? "" : "-")}{userSettings.PhotoSeriesName}.jpg");
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -93,8 +93,12 @@ public class PhotoWorker : BackgroundService
 
             var currentPhotoDateTime = _nextTime;
 
+            var seriesName = settings.PhotoSeriesName.SanitizeForFileName();
+            if (string.IsNullOrWhiteSpace(seriesName))  seriesName = Environment.MachineName.SanitizeForFileName();
+            if (string.IsNullOrWhiteSpace(seriesName)) seriesName = "UnknownSeries".SanitizeForFileName();
+
             var fileName = Path.Combine(settings.PhotoStorageDirectory,
-                $"{DateTime.Now:yyyy-MM-dd-HH-mm}-{currentPhotoDateTime.Description.SanitizeForFileName()}-{(string.IsNullOrWhiteSpace(settings.PhotoNamePostfix) ? "" : "-")}{settings.PhotoNamePostfix.SanitizeForFileName()}.jpg");
+                $"{DateTime.Now:yyyy-MM-dd-HH-mm}-{currentPhotoDateTime.Description.SanitizeForFileName()}--{seriesName}.jpg");
 
             var photoExecutable = "libcamera-still";
             var photoArguments = $"-o {fileName} {_nextTime.LibCameraParameters}".Trim();
