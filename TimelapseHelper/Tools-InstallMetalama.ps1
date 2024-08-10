@@ -1,0 +1,1 @@
+dotnet tool install -g metalama.tool;

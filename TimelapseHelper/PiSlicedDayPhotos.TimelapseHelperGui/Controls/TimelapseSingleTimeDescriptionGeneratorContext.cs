@@ -40,7 +40,8 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
     public required ConversionDataEntryNoChangeIndicatorContext<DateTime?> TimeLapseEndsOnEntry { get; set; }
     public string? CaptionFormatSample { get; set; } = string.Empty;
 
-    public static async Task<TimelapseSingleTimeDescriptionGeneratorContext> CreateInstance(StatusControlContext statusContext)
+    public static async Task<TimelapseSingleTimeDescriptionGeneratorContext> CreateInstance(
+        StatusControlContext statusContext)
     {
         await ThreadSwitcher.ResumeForegroundAsync();
         var factorySeriesItems = new ObservableCollection<SeriesListItem>();
@@ -107,19 +108,19 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
         var settings = TimelapseHelperGuiSettingsTools.ReadSettings();
         newControl.SourceFolder = settings.LastInputDirectory ?? string.Empty;
 
-        newControl.TimeLapseStartsOnEntry.PropertyChanged += (sender, args) =>
+        newControl.TimeLapseStartsOnEntry.PropertyChanged += (_, args) =>
         {
             if (args.PropertyName == nameof(ConversionDataEntryContext<DateTime?>.UserValue))
                 newControl.StatusContext.RunNonBlockingTask(newControl.UpdateSelectedPhotos);
         };
 
-        newControl.TimeLapseEndsOnEntry.PropertyChanged += (sender, args) =>
+        newControl.TimeLapseEndsOnEntry.PropertyChanged += (_, args) =>
         {
             if (args.PropertyName == nameof(ConversionDataEntryContext<DateTime?>.UserValue))
                 newControl.StatusContext.RunNonBlockingTask(newControl.UpdateSelectedPhotos);
         };
 
-        newControl.CaptionFormatEntry.PropertyChanged += (sender, args) =>
+        newControl.CaptionFormatEntry.PropertyChanged += (_, args) =>
         {
             if (args.PropertyName == nameof(StringDataEntryContext.UserValue))
                 newControl.StatusContext.RunNonBlockingTask(newControl.UpdateCaptionFormatSample);
@@ -140,7 +141,7 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
         {
             CaptionFormatSample = DateTime.Now.ToString(captionFormat);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             CaptionFormatSample = "(Error in Format!)";
         }
@@ -181,7 +182,7 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
         }));
 
         foreach (var loopSeriesItems in SeriesItems)
-            loopSeriesItems.PropertyChanged += (sender, args) =>
+            loopSeriesItems.PropertyChanged += (_, args) =>
             {
                 if (args.PropertyName == nameof(SeriesListItem.Selected))
                     StatusContext.RunNonBlockingTask(UpdateSelectedPhotos);
@@ -195,7 +196,7 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
         }));
 
         foreach (var loopDescriptions in TimeDescriptionItems)
-            loopDescriptions.PropertyChanged += (sender, args) =>
+            loopDescriptions.PropertyChanged += (_, args) =>
             {
                 if (args.PropertyName == nameof(SeriesListItem.Selected))
                 {
@@ -314,7 +315,7 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
             seriesOrder.Add(loopSelectedSeriesNames,
                 SeriesItems.IndexOf(SeriesItems.First(x => x.SeriesName == loopSelectedSeriesNames)));
 
-        var result = await PiSlicedDayPhotoTools.CreateSingleTimeDescriptionTimelapseFiles(SelectedPhotos.ToList(),
+        var result = SingleTimeDescription.SingleTimeDescriptionTimelapseFiles(SelectedPhotos.ToList(),
             FrameRateDataEntry.UserValue, seriesOrder, shouldRunCheck.Item2, StatusContext.ProgressTracker(),
             WriteCaptionDataEntry.UserValue, CaptionFormatEntry.UserValue, CaptionFontSizeEntry.UserValue);
 
@@ -389,7 +390,7 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
             seriesOrder.Add(loopSelectedSeriesNames,
                 SeriesItems.IndexOf(SeriesItems.First(x => x.SeriesName == loopSelectedSeriesNames)));
 
-        var result = await PiSlicedDayPhotoTools.CreateSingleTimeDescriptionTimelapse(SelectedPhotos.ToList(),
+        var result = await SingleTimeDescription.SingleTimeDescriptionTimelapse(SelectedPhotos.ToList(),
             FrameRateDataEntry.UserValue, seriesOrder, shouldRunCheck.Item2, StatusContext.ProgressTracker(),
             WriteCaptionDataEntry.UserValue, CaptionFormatEntry.UserValue, CaptionFontSizeEntry.UserValue);
 

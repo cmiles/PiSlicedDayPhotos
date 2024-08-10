@@ -1,5 +1,4 @@
 using Metalama.Patterns.Observability;
-using PointlessWaymarks.LlamaAspects;
 
 namespace PiSlicedDayPhotos.TimelapseHelperGui;
 
