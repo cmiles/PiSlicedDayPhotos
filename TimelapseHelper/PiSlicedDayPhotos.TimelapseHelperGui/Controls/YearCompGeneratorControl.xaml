@@ -1,16 +1,15 @@
-﻿<UserControl x:Class="PiSlicedDayPhotos.TimelapseHelperGui.Controls.TimelapseSingleTimeDescriptionGeneratorControl"
+﻿<UserControl x:Class="PiSlicedDayPhotos.TimelapseHelperGui.Controls.YearCompGeneratorControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PiSlicedDayPhotos.TimelapseHelperGui.Controls"
-             xmlns:conversionDataEntry="clr-namespace:PointlessWaymarks.WpfCommon.ConversionDataEntry;assembly=PointlessWaymarks.WpfCommon"
              xmlns:boolDataEntry="clr-namespace:PointlessWaymarks.WpfCommon.BoolDataEntry;assembly=PointlessWaymarks.WpfCommon"
+             xmlns:conversionDataEntry="clr-namespace:PointlessWaymarks.WpfCommon.ConversionDataEntry;assembly=PointlessWaymarks.WpfCommon"
              xmlns:stringDataEntry="clr-namespace:PointlessWaymarks.WpfCommon.StringDataEntry;assembly=PointlessWaymarks.WpfCommon"
              xmlns:dd="urn:gong-wpf-dragdrop"
-             mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance local:TimelapseSingleTimeDescriptionGeneratorContext}">
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" d:DataContext="{d:DesignInstance local:YearCompGeneratorControl}">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -33,7 +32,7 @@
             <StackPanel Orientation="Horizontal">
                 <Button Padding="4" Margin="4" Command="{Binding ChooseSourceFolderCommand}">Choose Directory With Pi-Sliced Day Photos</Button>
                 <TextBlock TextWrapping="Wrap" VerticalAlignment="Center" Margin="8,0,0,4"
-                           Text="{Binding SourceFolder}">
+                          Text="{Binding SourceFolder}">
                 </TextBlock>
             </StackPanel>
         </GroupBox>
@@ -61,11 +60,11 @@
                                             <StackPanel Orientation="Vertical">
                                                 <TextBlock Text="{Binding TimeDescription}"></TextBlock>
                                                 <TextBlock Margin="8,0,0,0"
-                                                           Text="{Binding PhotoCount, StringFormat='{}{0} Photos'}" />
+                                                          Text="{Binding PhotoCount, StringFormat='{}{0} Photos'}" />
                                                 <TextBlock Margin="16,0,0,0">
                                                     <TextBlock.Text>
                                                         <MultiBinding
-                                                            StringFormat="{}From {0:MM/dd/yy HH:mm} to {1:MM/dd/yy HH:mm}">
+                                                           StringFormat="{}From {0:MM/dd/yy HH:mm} to {1:MM/dd/yy HH:mm}">
                                                             <Binding Path="StartsOn" />
                                                             <Binding Path="EndsOn" />
                                                         </MultiBinding>
@@ -85,8 +84,8 @@
                     <TextBlock FontWeight="Bold">Series</TextBlock>
                 </GroupBox.Header>
                 <ListBox Margin="0,4,0,4" BorderThickness="0" ItemsSource="{Binding SeriesItems}"
-                         dd:DragDrop.IsDragSource="True"
-                         dd:DragDrop.IsDropTarget="True">
+                        dd:DragDrop.IsDragSource="True"
+                        dd:DragDrop.IsDropTarget="True">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="{x:Type local:SeriesListItem}">
                             <Border CornerRadius="2" BorderBrush="LightGray" BorderThickness="1" Margin="2">
@@ -95,11 +94,11 @@
                                         <StackPanel Orientation="Vertical">
                                             <TextBlock Text="{Binding SeriesName}"></TextBlock>
                                             <TextBlock Margin="8,0,0,0"
-                                                       Text="{Binding PhotoCount, StringFormat='{}{0} Photos'}" />
+                                                      Text="{Binding PhotoCount, StringFormat='{}{0} Photos'}" />
                                             <TextBlock Margin="16,0,0,0">
                                                 <TextBlock.Text>
                                                     <MultiBinding
-                                                        StringFormat="{}From {0:MM/dd/yy HH:mm} to {1:M/Mdd/yy HH:mm}">
+                                                       StringFormat="{}From {0:MM/dd/yy HH:mm} to {1:M/Mdd/yy HH:mm}">
                                                         <Binding Path="StartsOn" />
                                                         <Binding Path="EndsOn" />
                                                     </MultiBinding>
@@ -119,26 +118,26 @@
                 <TextBlock FontWeight="Bold">Settings</TextBlock>
             </GroupBox.Header>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                <conversionDataEntry:ConversionDataEntryControl DataContext="{Binding TimeLapseStartsOnEntry}"
-                                                                Width="120">
+                <conversionDataEntry:ConversionDataEntryControl DataContext="{Binding MainTimelineStartsOnEntry}"
+                                                               Width="120">
                 </conversionDataEntry:ConversionDataEntryControl>
                 <conversionDataEntry:ConversionDataEntryControl Grid.Column="1"
-                                                                DataContext="{Binding TimeLapseEndsOnEntry}"
-                                                                Width="120">
+                                                               DataContext="{Binding MainTimelineEndsOnEntry}"
+                                                               Width="120">
                 </conversionDataEntry:ConversionDataEntryControl>
                 <conversionDataEntry:ConversionDataEntryControl
-                    DataContext="{Binding FrameRateDataEntry}" Width="120">
+                   DataContext="{Binding FrameRateDataEntry}" Width="120">
                 </conversionDataEntry:ConversionDataEntryControl>
                 <boolDataEntry:BoolDataEntryControl Margin="6,0,0,0" VerticalAlignment="Bottom"
-                                                    DataContext="{Binding WriteCaptionDataEntry}">
+                                                   DataContext="{Binding WriteCaptionDataEntry}">
                 </boolDataEntry:BoolDataEntryControl>
                 <conversionDataEntry:ConversionDataEntryControl DataContext="{Binding CaptionFontSizeEntry}"
-                                                                Width="120">
+                                                               Width="120">
                 </conversionDataEntry:ConversionDataEntryControl>
                 <stringDataEntry:StringDataEntryControl DataContext="{Binding CaptionFormatEntry}" Width="120">
                 </stringDataEntry:StringDataEntryControl>
                 <TextBlock Margin="10, 0,4,2" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                           Text="{Binding CaptionFormatSample}" Width="120">
+                          Text="{Binding CaptionFormatSample}" Width="120">
                 </TextBlock>
             </StackPanel>
         </GroupBox>
@@ -164,7 +163,7 @@
                         </TextBlock>
                     </StackPanel>
                     <DataGrid Grid.Row="1" ItemsSource="{Binding SelectedPhotos}" IsReadOnly="True"
-                              AutoGenerateColumns="True">
+                             AutoGenerateColumns="True">
                     </DataGrid>
                 </Grid>
             </GroupBox>
@@ -179,12 +178,12 @@
                     <ColumnDefinition></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <Button Height="28" Margin="4,2,4,4" Style="{StaticResource ActionPanelUnlimitedWidthButtonStyle}"
-                        Command="{Binding WriteTimelapseFilesCommand}">
+                       Command="{Binding WriteTimelapseFilesCommand}">
                     Create Files for Timelapse
                 </Button>
                 <Button Grid.Column="1" Height="28" Margin="4,2,4,4"
-                        Style="{StaticResource ActionPanelUnlimitedWidthButtonStyle}"
-                        Command="{Binding CreateTimelapseCommand}">
+                       Style="{StaticResource ActionPanelUnlimitedWidthButtonStyle}"
+                       Command="{Binding CreateTimelapseCommand}">
                     Create Timelapse Video
                 </Button>
             </Grid>

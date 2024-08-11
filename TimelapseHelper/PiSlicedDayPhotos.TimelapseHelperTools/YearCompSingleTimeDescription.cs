@@ -4,6 +4,29 @@ namespace PiSlicedDayPhotos.TimelapseHelperTools;
 
 public static class YearCompSingleTimeDescription
 {
+    public static async Task<(string resultFile, bool errors, List<string> runLog)>
+        YearCompSingleTimeDescriptionTimelapse(List<PiSlicedDayPhotoInformation> photos,
+            DateTime mainSetStartTime, DateTime mainSetEndTime, int framerate,
+            Dictionary<string, int> seriesOrderLookup, string ffmpegExe, IProgress<string> progress,
+            bool writeDateTimeString, string dateCaptionDateTimeFormat = "yyyy MMMM", int fontSize = 24)
+    {
+        var fileDirectory = YearCompSingleTimeDescriptionTimelapseFiles(photos, mainSetStartTime, mainSetEndTime,
+            framerate, seriesOrderLookup,
+            ffmpegExe, progress, writeDateTimeString, dateCaptionDateTimeFormat, fontSize);
+
+        var resultFile = $"Timelapse-Created-{DateTime.Now:yyyy-MM-dd HH-mm}.mp4";
+
+        var command =
+            $"""
+             cd '{fileDirectory}'
+             {ffmpegExe} -framerate {framerate} -i z_timelapse--%06d.jpg -s:v 3840x2160 -c:v libx264 -crf 17 -r 30 '{resultFile}'
+             """;
+
+        var runResult = await PowerShellRun.ExecuteScript(command, progress);
+
+        return (Path.Combine(fileDirectory, resultFile), runResult.fatalErrors, runResult.runLog);
+    }
+
     public static string
         YearCompSingleTimeDescriptionTimelapseFiles(List<PiSlicedDayPhotoInformation> photos,
             DateTime mainSetStartTime, DateTime mainSetEndTime, int framerate,
@@ -108,7 +131,7 @@ public static class YearCompSingleTimeDescription
     }
 
 
-    public static void CombineImages(List<string> topRowImages, List<string> bottomRowImages, string outputPath,
+    private static void CombineImages(List<string> topRowImages, List<string> bottomRowImages, string outputPath,
         int width, int height)
     {
         var rows = 2;

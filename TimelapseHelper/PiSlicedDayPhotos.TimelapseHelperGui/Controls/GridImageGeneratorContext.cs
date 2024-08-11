@@ -16,9 +16,9 @@ namespace PiSlicedDayPhotos.TimelapseHelperGui.Controls;
 
 [Observable]
 [GenerateStatusCommands]
-public partial class TimelapseSingleTimeDescriptionGeneratorContext
+public partial class GridImageGeneratorContext
 {
-    public TimelapseSingleTimeDescriptionGeneratorContext()
+    public GridImageGeneratorContext()
     {
         PropertyChanged += OnPropertyChanged;
     }
@@ -40,7 +40,7 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
     public required ConversionDataEntryNoChangeIndicatorContext<DateTime?> TimeLapseEndsOnEntry { get; set; }
     public string? CaptionFormatSample { get; set; } = string.Empty;
 
-    public static async Task<TimelapseSingleTimeDescriptionGeneratorContext> CreateInstance(
+    public static async Task<GridImageGeneratorContext> CreateInstance(
         StatusControlContext statusContext)
     {
         await ThreadSwitcher.ResumeForegroundAsync();
@@ -52,13 +52,13 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
         var factoryStartsOnEntry =
             await ConversionDataEntryNoChangeIndicatorContext<DateTime?>.CreateInstance(ConversionDataEntryHelpers
                 .DateTimeNullableConversion);
-        factoryStartsOnEntry.Title = "Photos After";
+        factoryStartsOnEntry.Title = "Photos After - Blank will start with the Earliest Possible Photo";
         factoryStartsOnEntry.HelpText = "Only include photos taken on or after this date.";
 
         var factoryEndsOnEntry =
             await ConversionDataEntryNoChangeIndicatorContext<DateTime?>.CreateInstance(ConversionDataEntryHelpers
                 .DateTimeNullableConversion);
-        factoryEndsOnEntry.Title = "Photos Before";
+        factoryEndsOnEntry.Title = "Photos Before - Blank will start with the Last Possible Photo";
         factoryEndsOnEntry.HelpText = "Only include photos taken on or before this date.";
 
         var factoryFrameRateEntry = await ConversionDataEntryNoChangeIndicatorContext<int>.CreateInstance(
@@ -92,7 +92,7 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
         factoryYearComparisonEntry.HelpText =
             "If checked the timelapse will be created with a comparison of the same day from the previous year.";
 
-        var newControl = new TimelapseSingleTimeDescriptionGeneratorContext
+        var newControl = new GridImageGeneratorContext
         {
             SeriesItems = factorySeriesItems,
             TimeDescriptionItems = factoryTimeDescriptionItems,
@@ -104,7 +104,7 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
             FrameRateDataEntry = factoryFrameRateEntry,
             CaptionFormatEntry = factoryCaptionFormatEntry,
             WriteCaptionDataEntry = factoryWriteCaptionEntry,
-            CaptionFontSizeEntry = factoryCaptionFontSizeEntry,
+            CaptionFontSizeEntry = factoryCaptionFontSizeEntry
         };
 
         await ThreadSwitcher.ResumeBackgroundAsync();
@@ -181,7 +181,8 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
 
         series.ForEach(x => SeriesItems.Add(new SeriesListItem
         {
-            SeriesName = x, PhotoCount = sourcePhotos.Count(y => y.Series.Equals(x)),
+            SeriesName = x,
+            PhotoCount = sourcePhotos.Count(y => y.Series.Equals(x)),
             StartsOn = sourcePhotos.Where(y => y.Series.Equals(x)).MinBy(y => y.TakenOn)?.TakenOn,
             EndsOn = sourcePhotos.Where(y => y.Series.Equals(x)).MaxBy(y => y.TakenOn)?.TakenOn
         }));
@@ -195,7 +196,8 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
 
         timeDescriptions.ForEach(x => TimeDescriptionItems.Add(new TimeDescriptionListItem
         {
-            TimeDescription = x, PhotoCount = sourcePhotos.Count(y => y.Description.Equals(x)),
+            TimeDescription = x,
+            PhotoCount = sourcePhotos.Count(y => y.Description.Equals(x)),
             StartsOn = sourcePhotos.Where(y => y.Description.Equals(x)).MinBy(y => y.TakenOn)?.TakenOn,
             EndsOn = sourcePhotos.Where(y => y.Description.Equals(x)).MaxBy(y => y.TakenOn)?.TakenOn
         }));
@@ -352,12 +354,6 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
         if (FrameRateDataEntry.HasValidationIssues)
         {
             StatusContext.ToastError("Frame Rate Entry Issues?");
-            return (false, string.Empty);
-        }
-
-        if (!SelectedPhotos.Any())
-        {
-            StatusContext.ToastError("The current settings don't include any photos?");
             return (false, string.Empty);
         }
 

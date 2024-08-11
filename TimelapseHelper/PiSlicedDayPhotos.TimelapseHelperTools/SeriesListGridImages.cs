@@ -128,7 +128,7 @@ public static class SeriesListGridImages
         return outputDirectory.FullName;
     }
 
-    public static void CombineImages(List<string> imagePaths, int imageWidth, int imageHeight, int rows, int columns,
+    private static void CombineImages(List<string> imagePaths, int imageWidth, int imageHeight, int rows, int columns,
         string outputFile)
     {
         var canvasWidth = columns * imageWidth;

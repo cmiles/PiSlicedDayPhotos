@@ -20,7 +20,13 @@
     <Grid>
         <TabControl>
             <TabItem Header="Single Time Description">
-                <controls:TimelapseSingleTimeDescriptionGeneratorControl DataContext="{Binding TimelapseContext}"></controls:TimelapseSingleTimeDescriptionGeneratorControl>
+                <controls:TimelapseSingleTimeDescriptionGeneratorControl DataContext="{Binding SingleTimeDescriptionContext}"></controls:TimelapseSingleTimeDescriptionGeneratorControl>
+            </TabItem>
+            <TabItem Header="Year Comp">
+                <controls:YearCompGeneratorControl DataContext="{Binding YearCompContext}"></controls:YearCompGeneratorControl>
+            </TabItem>
+            <TabItem Header="Image Grid">
+                <controls:GridImageGeneratorControl DataContext="{Binding GridImageContext}"></controls:GridImageGeneratorControl>
             </TabItem>
             <TabItem Header="App Settings">
                 <controls:AppSettingsControl DataContext="{Binding SettingsContext}"></controls:AppSettingsControl>
