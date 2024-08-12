@@ -53,13 +53,15 @@ public partial class YearCompGeneratorContext
             await ConversionDataEntryNoChangeIndicatorContext<DateTime?>.CreateInstance(ConversionDataEntryHelpers
                 .DateTimeNullableConversion);
         factoryStartsOnEntry.Title = "Main Year After";
-        factoryStartsOnEntry.HelpText = "Only include photos taken on or after this date for the main (last) timeline of the comp series.";
+        factoryStartsOnEntry.HelpText =
+            "Only include photos taken on or after this date for the main (last) timeline of the comp series.";
 
         var factoryEndsOnEntry =
             await ConversionDataEntryNoChangeIndicatorContext<DateTime?>.CreateInstance(ConversionDataEntryHelpers
                 .DateTimeNullableConversion);
         factoryEndsOnEntry.Title = "Main Year Before";
-        factoryEndsOnEntry.HelpText = "Only include photos taken on or before this date for the main (last) timeline of the comp series.";
+        factoryEndsOnEntry.HelpText =
+            "Only include photos taken on or before this date for the main (last) timeline of the comp series.";
 
         var factoryFrameRateEntry = await ConversionDataEntryNoChangeIndicatorContext<int>.CreateInstance(
             ConversionDataEntryHelpers
@@ -336,11 +338,11 @@ public partial class YearCompGeneratorContext
         StatusContext.Progress($"Cameras: {string.Join(", ", selectedSeriesNames)}");
         StatusContext.Progress($"Time Descriptions: {string.Join(", ", selectedTimeDescriptions)}");
 
-        var seriesOrder = new Dictionary<string, int>();
+        var seriesOrder = new Dictionary<int, string>();
 
         foreach (var loopSelectedSeriesNames in selectedSeriesNames)
-            seriesOrder.Add(loopSelectedSeriesNames,
-                SeriesItems.IndexOf(SeriesItems.First(x => x.SeriesName == loopSelectedSeriesNames)));
+            seriesOrder.Add(SeriesItems.IndexOf(SeriesItems.First(x => x.SeriesName == loopSelectedSeriesNames)),
+                loopSelectedSeriesNames);
 
         var result = YearCompSingleTimeDescription.YearCompSingleTimeDescriptionTimelapseFiles(SelectedPhotos.ToList(),
             MainTimelineStartsOnEntry.UserValue.Value, MainTimelineEndsOnEntry.UserValue.Value,
@@ -430,15 +432,15 @@ public partial class YearCompGeneratorContext
         StatusContext.Progress($"Cameras: {string.Join(", ", selectedSeriesNames)}");
         StatusContext.Progress($"Time Descriptions: {string.Join(", ", selectedTimeDescriptions)}");
 
-        var seriesOrder = new Dictionary<string, int>();
+        var seriesOrder = new Dictionary<int, string>();
 
         foreach (var loopSelectedSeriesNames in selectedSeriesNames)
-            seriesOrder.Add(loopSelectedSeriesNames,
-                SeriesItems.IndexOf(SeriesItems.First(x => x.SeriesName == loopSelectedSeriesNames)));
+            seriesOrder.Add(SeriesItems.IndexOf(SeriesItems.First(x => x.SeriesName == loopSelectedSeriesNames)),
+                loopSelectedSeriesNames);
 
         var result = await YearCompSingleTimeDescription.YearCompSingleTimeDescriptionTimelapse(SelectedPhotos.ToList(),
             MainTimelineStartsOnEntry.UserValue.Value, MainTimelineEndsOnEntry.UserValue.Value,
-            FrameRateDataEntry.UserValue, seriesOrder, shouldRunCheck.Item2, StatusContext.ProgressTracker(),
+            seriesOrder, FrameRateDataEntry.UserValue, shouldRunCheck.Item2, StatusContext.ProgressTracker(),
             WriteCaptionDataEntry.UserValue, CaptionFormatEntry.UserValue, CaptionFontSizeEntry.UserValue);
 
         if (File.Exists(result.resultFile)) await OpenExplorerWindowForFile(result.resultFile);

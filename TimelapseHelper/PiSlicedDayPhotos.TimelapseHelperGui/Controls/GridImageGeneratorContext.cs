@@ -202,18 +202,11 @@ public partial class GridImageGeneratorContext
             EndsOn = sourcePhotos.Where(y => y.Description.Equals(x)).MaxBy(y => y.TakenOn)?.TakenOn
         }));
 
-        foreach (var loopDescriptions in TimeDescriptionItems)
-            loopDescriptions.PropertyChanged += (_, args) =>
+        foreach (var loopTimeDescriptionItems in TimeDescriptionItems)
+            loopTimeDescriptionItems.PropertyChanged += (_, args) =>
             {
-                if (args.PropertyName == nameof(SeriesListItem.Selected))
-                {
-                    //Set other TimeDescription items to Selected = false
-                    if (loopDescriptions.Selected)
-                        foreach (var loopTimeDescriptionItems in TimeDescriptionItems)
-                            if (loopTimeDescriptionItems != loopDescriptions)
-                                loopTimeDescriptionItems.Selected = false;
+                if (args.PropertyName == nameof(TimeDescriptionListItem.Selected))
                     StatusContext.RunNonBlockingTask(UpdateSelectedPhotos);
-                }
             };
 
         sourcePhotos.ForEach(x => SourcePhotos.Add(x));
@@ -316,14 +309,20 @@ public partial class GridImageGeneratorContext
         StatusContext.Progress($"Cameras: {string.Join(", ", selectedSeriesNames)}");
         StatusContext.Progress($"Time Descriptions: {string.Join(", ", selectedTimeDescriptions)}");
 
-        var seriesOrder = new Dictionary<string, int>();
+        var seriesOrder = new Dictionary<int, string>();
 
         foreach (var loopSelectedSeriesNames in selectedSeriesNames)
-            seriesOrder.Add(loopSelectedSeriesNames,
-                SeriesItems.IndexOf(SeriesItems.First(x => x.SeriesName == loopSelectedSeriesNames)));
+            seriesOrder.Add(SeriesItems.IndexOf(SeriesItems.First(x => x.SeriesName == loopSelectedSeriesNames)),
+                loopSelectedSeriesNames);
 
-        var result = SingleTimeDescription.SingleTimeDescriptionTimelapseFiles(SelectedPhotos.ToList(),
-            FrameRateDataEntry.UserValue, seriesOrder, shouldRunCheck.Item2, StatusContext.ProgressTracker(),
+        var timeDescriptionOrder = new Dictionary<int, string>();
+        foreach (var loopSelectedSeriesNames in selectedTimeDescriptions)
+            timeDescriptionOrder.Add(
+                SeriesItems.IndexOf(SeriesItems.First(x => x.SeriesName == loopSelectedSeriesNames)),
+                loopSelectedSeriesNames);
+
+        var result = SeriesListGridImages.ImageGridTimeDescriptionFiles(SelectedPhotos.ToList(),
+            timeDescriptionOrder, seriesOrder, StatusContext.ProgressTracker(),
             WriteCaptionDataEntry.UserValue, CaptionFormatEntry.UserValue, CaptionFontSizeEntry.UserValue);
 
         if (Directory.Exists(result)) await OpenExplorerWindowForDirectory(result);
@@ -342,12 +341,6 @@ public partial class GridImageGeneratorContext
         if (SelectedTimeDescriptionItems().Count == 0)
         {
             StatusContext.ToastError("No Time Descriptions Selected?");
-            return (false, string.Empty);
-        }
-
-        if (SelectedTimeDescriptionItems().Count > 1)
-        {
-            StatusContext.ToastError("Please select a single Time Description");
             return (false, string.Empty);
         }
 
@@ -391,14 +384,21 @@ public partial class GridImageGeneratorContext
         StatusContext.Progress($"Cameras: {string.Join(", ", selectedSeriesNames)}");
         StatusContext.Progress($"Time Descriptions: {string.Join(", ", selectedTimeDescriptions)}");
 
-        var seriesOrder = new Dictionary<string, int>();
+        var seriesOrder = new Dictionary<int, string>();
 
         foreach (var loopSelectedSeriesNames in selectedSeriesNames)
-            seriesOrder.Add(loopSelectedSeriesNames,
-                SeriesItems.IndexOf(SeriesItems.First(x => x.SeriesName == loopSelectedSeriesNames)));
+            seriesOrder.Add(SeriesItems.IndexOf(SeriesItems.First(x => x.SeriesName == loopSelectedSeriesNames)),
+                loopSelectedSeriesNames);
 
-        var result = await SingleTimeDescription.SingleTimeDescriptionTimelapse(SelectedPhotos.ToList(),
-            FrameRateDataEntry.UserValue, seriesOrder, shouldRunCheck.Item2, StatusContext.ProgressTracker(),
+        var timeDescriptionOrder = new Dictionary<int, string>();
+        foreach (var loopSelectedSeriesNames in selectedTimeDescriptions)
+            timeDescriptionOrder.Add(
+                TimeDescriptionItems.IndexOf(TimeDescriptionItems.First(x =>
+                    x.TimeDescription == loopSelectedSeriesNames)),
+                loopSelectedSeriesNames);
+
+        var result = await SeriesListGridImages.ImageGridTimelapse(SelectedPhotos.ToList(), timeDescriptionOrder,
+            seriesOrder, FrameRateDataEntry.UserValue, shouldRunCheck.Item2, StatusContext.ProgressTracker(),
             WriteCaptionDataEntry.UserValue, CaptionFormatEntry.UserValue, CaptionFontSizeEntry.UserValue);
 
         if (File.Exists(result.resultFile)) await OpenExplorerWindowForFile(result.resultFile);

@@ -104,7 +104,7 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
             FrameRateDataEntry = factoryFrameRateEntry,
             CaptionFormatEntry = factoryCaptionFormatEntry,
             WriteCaptionDataEntry = factoryWriteCaptionEntry,
-            CaptionFontSizeEntry = factoryCaptionFontSizeEntry,
+            CaptionFontSizeEntry = factoryCaptionFontSizeEntry
         };
 
         await ThreadSwitcher.ResumeBackgroundAsync();
@@ -314,11 +314,10 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
         StatusContext.Progress($"Cameras: {string.Join(", ", selectedSeriesNames)}");
         StatusContext.Progress($"Time Descriptions: {string.Join(", ", selectedTimeDescriptions)}");
 
-        var seriesOrder = new Dictionary<string, int>();
+        var seriesOrder = new Dictionary<int, string>();
 
         foreach (var loopSelectedSeriesNames in selectedSeriesNames)
-            seriesOrder.Add(loopSelectedSeriesNames,
-                SeriesItems.IndexOf(SeriesItems.First(x => x.SeriesName == loopSelectedSeriesNames)));
+            seriesOrder.Add(SeriesItems.IndexOf(SeriesItems.First(x => x.SeriesName == loopSelectedSeriesNames)), loopSelectedSeriesNames);
 
         var result = SingleTimeDescription.SingleTimeDescriptionTimelapseFiles(SelectedPhotos.ToList(),
             FrameRateDataEntry.UserValue, seriesOrder, shouldRunCheck.Item2, StatusContext.ProgressTracker(),
@@ -395,14 +394,14 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
         StatusContext.Progress($"Cameras: {string.Join(", ", selectedSeriesNames)}");
         StatusContext.Progress($"Time Descriptions: {string.Join(", ", selectedTimeDescriptions)}");
 
-        var seriesOrder = new Dictionary<string, int>();
+        var seriesOrder = new Dictionary<int, string>();
 
         foreach (var loopSelectedSeriesNames in selectedSeriesNames)
-            seriesOrder.Add(loopSelectedSeriesNames,
-                SeriesItems.IndexOf(SeriesItems.First(x => x.SeriesName == loopSelectedSeriesNames)));
+            seriesOrder.Add(SeriesItems.IndexOf(SeriesItems.First(x => x.SeriesName == loopSelectedSeriesNames)),
+                loopSelectedSeriesNames);
 
         var result = await SingleTimeDescription.SingleTimeDescriptionTimelapse(SelectedPhotos.ToList(),
-            FrameRateDataEntry.UserValue, seriesOrder, shouldRunCheck.Item2, StatusContext.ProgressTracker(),
+            seriesOrder, FrameRateDataEntry.UserValue, shouldRunCheck.Item2, StatusContext.ProgressTracker(),
             WriteCaptionDataEntry.UserValue, CaptionFormatEntry.UserValue, CaptionFontSizeEntry.UserValue);
 
         if (File.Exists(result.resultFile)) await OpenExplorerWindowForFile(result.resultFile);

@@ -6,8 +6,8 @@ public static class YearCompSingleTimeDescription
 {
     public static async Task<(string resultFile, bool errors, List<string> runLog)>
         YearCompSingleTimeDescriptionTimelapse(List<PiSlicedDayPhotoInformation> photos,
-            DateTime mainSetStartTime, DateTime mainSetEndTime, int framerate,
-            Dictionary<string, int> seriesOrderLookup, string ffmpegExe, IProgress<string> progress,
+            DateTime mainSetStartTime, DateTime mainSetEndTime,
+            Dictionary<int, string> seriesOrderLookup, int framerate, string ffmpegExe, IProgress<string> progress,
             bool writeDateTimeString, string dateCaptionDateTimeFormat = "yyyy MMMM", int fontSize = 24)
     {
         var fileDirectory = YearCompSingleTimeDescriptionTimelapseFiles(photos, mainSetStartTime, mainSetEndTime,
@@ -30,7 +30,7 @@ public static class YearCompSingleTimeDescription
     public static string
         YearCompSingleTimeDescriptionTimelapseFiles(List<PiSlicedDayPhotoInformation> photos,
             DateTime mainSetStartTime, DateTime mainSetEndTime, int framerate,
-            Dictionary<string, int> seriesOrderLookup, string ffmpegExe, IProgress<string> progress,
+            Dictionary<int, string> seriesOrderLookup, string ffmpegExe, IProgress<string> progress,
             bool writeDateTimeString, string dateCaptionDateTimeFormat = "yyyy MMMM", int fontSize = 24)
     {
         var selectedTimeDescriptions = photos.Select(x => x.Description).Distinct().ToList();
@@ -101,10 +101,10 @@ public static class YearCompSingleTimeDescription
             var thisYearFiles = new List<string>();
             var lastYearFiles = new List<string>();
 
-            foreach (var loopSeries in seriesOrderLookup.OrderBy(x => x.Value))
+            foreach (var loopSeries in seriesOrderLookup.OrderBy(x => x.Key))
             {
-                var thisYearPossibleFile = loopThisYearGroup.Photos.FirstOrDefault(x => x.Series == loopSeries.Key);
-                var lastYearPossibleFile = lastYearGroup?.Photos.FirstOrDefault(x => x.Series == loopSeries.Key);
+                var thisYearPossibleFile = loopThisYearGroup.Photos.FirstOrDefault(x => x.Series == loopSeries.Value);
+                var lastYearPossibleFile = lastYearGroup?.Photos.FirstOrDefault(x => x.Series == loopSeries.Value);
 
                 thisYearFiles.Add(thisYearPossibleFile?.FileName ?? string.Empty);
                 lastYearFiles.Add(lastYearPossibleFile?.FileName ?? string.Empty);
@@ -147,7 +147,7 @@ public static class YearCompSingleTimeDescription
         DrawImages(canvas, bottomRowImages, width, height, height);
 
         using var image = surface.Snapshot();
-        using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+        using var data = image.Encode(SKEncodedImageFormat.Jpeg, 100);
         using var stream = File.OpenWrite(outputPath);
         data.SaveTo(stream);
     }

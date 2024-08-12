@@ -5,8 +5,8 @@ namespace PiSlicedDayPhotos.TimelapseHelperTools;
 public static class SingleTimeDescription
 {
     public static async Task<(string resultFile, bool errors, List<string> runLog)>
-        SingleTimeDescriptionTimelapse(List<PiSlicedDayPhotoInformation> photos, int framerate,
-            Dictionary<string, int> seriesOrderLookup, string ffmpegExe, IProgress<string> progress,
+        SingleTimeDescriptionTimelapse(List<PiSlicedDayPhotoInformation> photos,
+            Dictionary<int, string> seriesOrderLookup, int framerate, string ffmpegExe, IProgress<string> progress,
             bool writeDateTimeString, string dateCaptionDateTimeFormat = "yyyy MMMM", int fontSize = 24)
     {
         var fileDirectory = SingleTimeDescriptionTimelapseFiles(photos, framerate, seriesOrderLookup,
@@ -25,10 +25,9 @@ public static class SingleTimeDescription
         return (Path.Combine(fileDirectory, resultFile), runResult.fatalErrors, runResult.runLog);
     }
 
-
     public static string
         SingleTimeDescriptionTimelapseFiles(List<PiSlicedDayPhotoInformation> photos, int framerate,
-            Dictionary<string, int> seriesOrderLookup, string ffmpegExe, IProgress<string> progress,
+            Dictionary<int, string> seriesOrderLookup, string ffmpegExe, IProgress<string> progress,
             bool writeDateTimeString, string dateCaptionDateTimeFormat = "yyyy MMMM", int fontSize = 24)
     {
         var selectedTimeDescriptions = photos.Select(x => x.Description).Distinct().ToList();
@@ -121,9 +120,9 @@ public static class SingleTimeDescription
 
                 var files = new List<string>();
 
-                foreach (var loopSeries in seriesOrderLookup.OrderBy(x => x.Value))
+                foreach (var loopSeries in seriesOrderLookup.OrderBy(x => x.Key))
                 {
-                    var possibleFile = loopGroup.Photos.FirstOrDefault(x => x.Series == loopSeries.Key);
+                    var possibleFile = loopGroup.Photos.FirstOrDefault(x => x.Series == loopSeries.Value);
 
                     files.Add(possibleFile?.FileName ?? string.Empty);
                 }
