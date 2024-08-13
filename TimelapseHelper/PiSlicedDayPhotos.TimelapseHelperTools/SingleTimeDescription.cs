@@ -4,6 +4,8 @@ namespace PiSlicedDayPhotos.TimelapseHelperTools;
 
 public static class SingleTimeDescription
 {
+    public const string ConsoleSettingsIdentifier = "singledescription";
+
     public static async Task<(string resultFile, bool errors, List<string> runLog)>
         SingleTimeDescriptionTimelapse(List<PiSlicedDayPhotoInformation> photos,
             Dictionary<int, string> seriesOrderLookup, int framerate, string ffmpegExe, IProgress<string> progress,

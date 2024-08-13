@@ -7,7 +7,7 @@
 #endif
 
 #define MyAppPublisher "Charles Miles"
-#define MyAppOutputDir "M:\PiSlicedDayPhotos"
+#define MyAppOutputDir "M:\PiSlicedDayPhotos\PiSlicedDayPhotos.TimelapseHelperGuiInstallers"
 
 #define MyAppDefaultGroupName "Pi Sliced-Day Photos"
 

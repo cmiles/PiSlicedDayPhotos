@@ -16,17 +16,11 @@ $msBuild = & $vsWhere -latest -requires Microsoft.Component.MSBuild -find MSBuil
 
 if ($lastexitcode -ne 0) { throw ("Exec: " + $errorMessage) }
 
-$publishPath = "M:\PiSlicedDayPhotos\PiSlicedDayPhotos.TimelapseHelperGui"
+$publishPath = "M:\PiSlicedDayPhotos\PiSlicedDayPhotos.TimelapseHelperConsole"
 if(!(test-path -PathType container $publishPath)) { New-Item -ItemType Directory -Path $publishPath }
 
 Remove-Item -Path $publishPath\* -Recurse
 
-& $msBuild .\PiSlicedDayPhotos.TimelapseHelperGui\PiSlicedDayPhotos.TimelapseHelperGui.csproj -t:publish -p:PublishProfile=.\PiSlicedDayPhotos.TimelapseHelperGui\Properties\PublishProfile\FolderProfile.pubxml -verbosity:minimal
+& $msBuild .\PiSlicedDayPhotos.TimelapseHelper\PiSlicedDayPhotos.TimelapseHelper.csproj -t:publish -p:PublishProfile=.\PiSlicedDayPhotos.TimelapseHelper\Properties\PublishProfile\FolderProfile.pubxml -verbosity:minimal
 
 if ($lastexitcode -ne 0) { throw ("Exec: " + $errorMessage) }
-
-& 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' .\Publish-InnoSetupInstaller-TimelapseHelperGui.iss /DVersion=$PublishVersion /DGitCommit=$GitCommit
-
-if ($lastexitcode -ne 0) { throw ("Exec: " + $errorMessage) }
-
-

@@ -2,8 +2,10 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Text.Json;
 using Metalama.Patterns.Observability;
 using Ookii.Dialogs.Wpf;
+using PiSlicedDayPhotos.TimelapseHelper;
 using PiSlicedDayPhotos.TimelapseHelperTools;
 using PointlessWaymarks.LlamaAspects;
 using PointlessWaymarks.WpfCommon;
@@ -317,7 +319,8 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
         var seriesOrder = new Dictionary<int, string>();
 
         foreach (var loopSelectedSeriesNames in selectedSeriesNames)
-            seriesOrder.Add(SeriesItems.IndexOf(SeriesItems.First(x => x.SeriesName == loopSelectedSeriesNames)), loopSelectedSeriesNames);
+            seriesOrder.Add(SeriesItems.IndexOf(SeriesItems.First(x => x.SeriesName == loopSelectedSeriesNames)),
+                loopSelectedSeriesNames);
 
         var result = SingleTimeDescription.SingleTimeDescriptionTimelapseFiles(SelectedPhotos.ToList(),
             FrameRateDataEntry.UserValue, seriesOrder, shouldRunCheck.Item2, StatusContext.ProgressTracker(),
@@ -442,5 +445,57 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
         };
 
         Process.Start(ps);
+    }
+
+    [BlockingCommand]
+    public async Task WriteConsoleSettingsFile()
+    {
+        await ThreadSwitcher.ResumeBackgroundAsync();
+
+        var shouldRunCheck = await CheckCanCreateTimelapseAndFfmpegExe();
+
+        if (!shouldRunCheck.Item1) return;
+
+        var selectedSeriesNames = SelectedSeriesItems().Select(x => x.SeriesName).ToList();
+        var selectedTimeDescriptions = SelectedTimeDescriptionItems().Select(x => x.TimeDescription).ToList();
+
+        var seriesOrder = new Dictionary<int, string>();
+
+        foreach (var loopSelectedSeriesNames in selectedSeriesNames)
+            seriesOrder.Add(SeriesItems.IndexOf(SeriesItems.First(x => x.SeriesName == loopSelectedSeriesNames)),
+                loopSelectedSeriesNames);
+
+        var settings = new TimelapseHelperConsoleSettings
+        {
+            CaptionFontSize = CaptionFontSizeEntry.UserValue,
+            CaptionFormatString = CaptionFormatEntry.UserValue,
+            CaptionWithDateTime = WriteCaptionDataEntry.UserValue,
+            EndOn = TimeLapseEndsOnEntry.UserText,
+            StartOn = TimeLapseStartsOnEntry.UserText,
+            FfmpegExe = shouldRunCheck.Item2,
+            Framerate = FrameRateDataEntry.UserValue,
+            InputDirectory = SourceFolder,
+            SeriesList = string.Join(",", seriesOrder.OrderBy(x => x.Key).Select(x => x.Value)),
+            TimeDescriptionList = string.Join(",", selectedTimeDescriptions),
+            TimelapseType = SingleTimeDescription.ConsoleSettingsIdentifier
+        };
+
+        await ThreadSwitcher.ResumeForegroundAsync();
+
+        var saveFileDialog = new VistaSaveFileDialog
+        {
+            Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
+            DefaultExt = "json",
+            AddExtension = true
+        };
+
+        if (!saveFileDialog.ShowDialog() == true) return;
+
+        var fileName = saveFileDialog.FileName;
+
+        await ThreadSwitcher.ResumeBackgroundAsync();
+
+        var jsonString = JsonSerializer.Serialize(settings);
+        await File.WriteAllTextAsync(fileName, jsonString);
     }
 }

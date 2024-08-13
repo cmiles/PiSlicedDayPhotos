@@ -4,6 +4,8 @@ namespace PiSlicedDayPhotos.TimelapseHelperTools;
 
 public static class SeriesListGridImages
 {
+    public const string ConsoleSettingsIdentifier = "grid";
+
     public static async Task<(string resultFile, bool errors, List<string> runLog)>
         ImageGridTimelapse(List<PiSlicedDayPhotoInformation> photos,
             Dictionary<int, string> orderedTimeDescriptionList, Dictionary<int, string> orderedSeriesList,

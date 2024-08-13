@@ -142,10 +142,7 @@
             </GroupBox.Header>
             <StackPanel Margin="0,0,0,6" Orientation="Horizontal">
                 <conversionDataEntry:ConversionDataEntryControl Width="120" DataContext="{Binding TimeLapseStartsOnEntry}" />
-                <conversionDataEntry:ConversionDataEntryControl
-                    Grid.Column="1"
-                    Width="120"
-                    DataContext="{Binding TimeLapseEndsOnEntry}" />
+                <conversionDataEntry:ConversionDataEntryControl Width="120" DataContext="{Binding TimeLapseEndsOnEntry}" />
                 <conversionDataEntry:ConversionDataEntryControl Width="120" DataContext="{Binding FrameRateDataEntry}" />
                 <boolDataEntry:BoolDataEntryControl
                     Margin="6,0,0,0"
@@ -202,8 +199,17 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition />
+                    <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <Button
+                    Height="28"
+                    Margin="4,2,4,4"
+                    Command="{Binding WriteConsoleSettingsFileCommand}"
+                    Style="{StaticResource ActionPanelUnlimitedWidthButtonStyle}">
+                    Write to Console Settings File
+                </Button>
+                <Button
+                    Grid.Column="1"
                     Height="28"
                     Margin="4,2,4,4"
                     Command="{Binding WriteTimelapseFilesCommand}"
@@ -211,7 +217,7 @@
                     Create Files for Timelapse
                 </Button>
                 <Button
-                    Grid.Column="1"
+                    Grid.Column="2"
                     Height="28"
                     Margin="4,2,4,4"
                     Command="{Binding CreateTimelapseCommand}"

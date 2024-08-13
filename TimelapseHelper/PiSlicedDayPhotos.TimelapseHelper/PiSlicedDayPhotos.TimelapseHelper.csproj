@@ -5,4 +5,8 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PiSlicedDayPhotos.TimelapseHelperTools\PiSlicedDayPhotos.TimelapseHelperTools.csproj" />
+  </ItemGroup>
+
 </Project>

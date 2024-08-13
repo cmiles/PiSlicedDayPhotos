@@ -4,6 +4,8 @@ namespace PiSlicedDayPhotos.TimelapseHelperTools;
 
 public static class YearCompSingleTimeDescription
 {
+    public const string ConsoleSettingsIdentifier = "yearcomp";
+
     public static async Task<(string resultFile, bool errors, List<string> runLog)>
         YearCompSingleTimeDescriptionTimelapse(List<PiSlicedDayPhotoInformation> photos,
             DateTime mainSetStartTime, DateTime mainSetEndTime,
@@ -11,7 +13,7 @@ public static class YearCompSingleTimeDescription
             bool writeDateTimeString, string dateCaptionDateTimeFormat = "yyyy MMMM", int fontSize = 24)
     {
         var fileDirectory = YearCompSingleTimeDescriptionTimelapseFiles(photos, mainSetStartTime, mainSetEndTime,
-            framerate, seriesOrderLookup,
+             seriesOrderLookup, framerate,
             ffmpegExe, progress, writeDateTimeString, dateCaptionDateTimeFormat, fontSize);
 
         var resultFile = $"Timelapse-Created-{DateTime.Now:yyyy-MM-dd HH-mm}.mp4";
@@ -29,8 +31,8 @@ public static class YearCompSingleTimeDescription
 
     public static string
         YearCompSingleTimeDescriptionTimelapseFiles(List<PiSlicedDayPhotoInformation> photos,
-            DateTime mainSetStartTime, DateTime mainSetEndTime, int framerate,
-            Dictionary<int, string> seriesOrderLookup, string ffmpegExe, IProgress<string> progress,
+            DateTime mainSetStartTime, DateTime mainSetEndTime, 
+            Dictionary<int, string> seriesOrderLookup, int framerate, string ffmpegExe, IProgress<string> progress,
             bool writeDateTimeString, string dateCaptionDateTimeFormat = "yyyy MMMM", int fontSize = 24)
     {
         var selectedTimeDescriptions = photos.Select(x => x.Description).Distinct().ToList();
