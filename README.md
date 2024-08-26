@@ -2,27 +2,29 @@
 
 This is a small .NET Core (C#) program designed to be run on a Raspberry Pi that takes photographs at Sunrise, Sunset, a number intervals in-between and at custom times specified either by clock time or minutes +/- from sunrise/sunset.
 
-The sunrise/sunset times must be provided to the program as a CSV file - a number of libraries/APIs are available to calculate sunrise/sunset at a particular location but taking the sunrise/sunset times from a file leaves you free to calculate them in whatever way you prefer. One of the most useful examples is generating the sunrise/sunset time considering  local topography - the sun on an imagined horizon is not photographically useful or interesting, when the sun rises behind a mountain peak is much more interesting.
+The sunrise/sunset times for the program must be provided as a CSV file - this requires some extra work to setup but leaves you free to use any times you want. A great is way to use this is generating  sunrise/sunset times based on the topography around the camera site (see the notes below) - in many cases the sunrise time on an imagined horizon is not photographically useful or interesting, the sunrise time when the sun emerges from behind a mountain peak is much more interesting!
 
-The in-between intervals are calculated based on sunrise/sunset times provided as a CSV file. Since the provided sunrise/sunset times may take topography (or other factors) into account the photographs might not be at the same sun angle each day, but will be at the same relative time between sunrise/sunset.
+This program can also take photographs at a number of intervals between the input sunrise/sunset times. Because the intervals are calculated based on the input sunrise/sunset, which may take topography or other factors into account, the photographs might not be at the same sun angle each day, but will be at the same relative time between sunrise/sunset.
 
-Living in the shadow of a mountain peak inspired this setup, 'halfway thru the available sunlight for the day' is much more interesting to me than a photo taken at a certain clock time or sun angle...
+While the scheduling has some flexibility and a number of options the core inspiration for this program is living in the mountains. The flexible sunrise/sunset times allow us to input times that match when the sun comes over the ridge to the east and when it sets over the various mountains on the skyline to the west. With the sunrise/sunset times so influenced by topography 'halfway thru the available sunlight for the day' becomes much more interesting than a photo taken at a certain clock time or sun angle.
 
-For this program to work it requires:
- - A Raspberry Pi where .NET Core can run and an attached camera that responds to libcamera-still. This program has only been confirmed to run on a Raspberry Pi 3 A+ with a Camera Module 3 Wide - but I believe any 2+ version Pis with current versions of the Raspberry Pi OS should work with any of the official Pi camera modules.
- - A settings file named PiSlicedDaySettings.json - an example is included in the code and there are notes below
- - A CSV file named SunriseAndSunset.csv with the calendar day, sunrise time (local) and sunset time (local).
+One possible final output for the photographs from this program is as a timelapse. The files from the Pi Sliced Day Photos program have names that are easy to sort and filter - a good start to producing a timelapse - but you might find that you want additional options like combining images from multiple cameras, getting a set of files in a single directory with simple sequential file names or automating creating a timelapse via a command line app... See the [Pi Sliced Day Timelapse Helper](https://github.com/cmiles/PiSlicedDayPhotos/blob/main/TimelapseHelper/README.MD) for help!
+
+The image below was created in Photoshop by combining the output of this program from 3 Raspberry Pi 3 A+ computers with Wide Angle Camera Module 3 cameras - the cameras face, approximately, west, north and east
+
+![OutputExample](PiSlicedDayMedia/PiSlicedDayPhotos-CombinedExample.jpg "Images created with this program combined in Photoshop from 3 Raspberry Pi 3 A+ computers with Wide Angle Camera Module 3 cameras - the cameras face, approximately, west, north and east.")
+
+### Program Requirements
+
+ - A Raspberry Pi where .NET Core can run and an attached camera that responds to libcamera-still. This program has only been confirmed to run on a Raspberry Pi 3 A+ and B+ with a Camera Module 3 Wide - but I believe any 2+ version Pis, official Pi camera modules and current version of the Raspberry Pi OS will work.
+ - A settings file named PiSlicedDaySettings.json - an example is included in the code and there are notes below.
+ - A CSV file named SunriseAndSunset.csv with the calendar day, sunrise time (local) and sunset time (local) - an example file is included with the code.
 
 Sunrise and Sunset are always photographed - you can also specify:
  - How many photographs you want between Sunrise and Sunset (during the day - 0 is valid)
  - How many photographs you want between Sunset and Sunrise (during the night - 0 is valid)
  - Times relative to sunrise and sunset - for example Sunrise-10 for a photograph 10 minutes before Sunrise or Sunset+10 for a photograph 10 minutes after Sunset.
  - Clock Times
-
-The image below was created in Photoshop by combining the output of this program from 3 Raspberry Pi 3 A+ computers with Wide Angle Camera Module 3 cameras - the cameras face, approximately, west, north and east
-
-![OutputExample](PiSlicedDayMedia/PiSlicedDayPhotos-CombinedExample.jpg "Images created with this program combined in Photoshop from 3 Raspberry Pi 3 A+ computers with Wide Angle Camera Module 3 cameras - the cameras face, approximately, west, north and east.")
-
 
 ### SunriseAndSunset.csv
 
@@ -126,8 +128,6 @@ My preference is for Automatic/Unattended Upgrades - do this long enough and som
 	sudo dpkg-reconfigure --priority=low unattended-upgrades
 	```
 
-I use two csx script files: RedeployPiSlicedDayPhotos.csx to help re-deploy the program (useful for development work and updating multiple Pis) and SftpPiSlicedDayPhotosToLocalDirectory.csx to copy the photos from the Pis to a central computer. These are included in the repository and there are comments in the files with notes on setting up for and running these scripts. I run both via the [PointlessWaymarks Powershell Runner](https://github.com/cmiles/PointlessWaymarksProject/tree/main/PointlessWaymarks.PowershellRunnerGui) to make it easy to schedule, save in one location and to have the commandline arguments saved with appropriate security.
-
 If you've worked in years gone by with the Pi Camera and C# you might know the very useful [techyian/MMALSharp: C# wrapper to Broadcom's MMAL with an API to the Raspberry Pi camera](https://github.com/techyian/MMALSharp) - unfortunately without choosing an older version of Raspberry Pi OS that library no longer works. The Pi has moved on to [libcamera](https://libcamera.org/). I didn't find a C# wrapper for libcamera and since I didn't need to do anything other than write stills to the Pi's storage calling libcamera-still 'command line style' seemed to be the best option.
 
 I didn't find a single great place for libcamera-still documentation - frustrating until I figured out that (beyond 'getting started' content) running 'libcamera-still --help' was really the best single source of information.
@@ -138,13 +138,14 @@ I have been running 3 Raspberry Pi 3 A+ computers with the Wide Angle Camera Mod
   - Dirty UV lens filters: With these in an exposed outdoor location I anticipated the outside of the filters getting dirty - but I didn't realize how dirty the inside would get. In my initial setup I hot glued UV filters to the enclosures to weatherproof the camera opening - this worked well overall but there is no easy way to clean the inside of the filter or the lens of the Camera Module. I have now updated my enclosures with an [inexpensive 58-55mm Step-Down Ring](https://www.bhphotovideo.com/c/product/809694-REG/Sensei_sdr5855_58_55mm_Step_Down_Ring.html) hot glued to the enclosure for the UV filter to screw into. This is an improvement, but I do wonder whether after 6-12 months of sitting outside unattended whether the UV filter will still be easily removable.
   - File Names: My Pis have run long enough for the sun at sunset to make a full trip south to north. When I went to process some of the photos I realized that there were some good details - the date and time was available directly in the file name and I had used the PhotoNamePostfix setting to identify the different cameras in the file names. But because the sunset/sunrise times are constantly changing it was more difficult than it should have been to filter the files for sunset/sunrise/slice... The Program has been updated so that file names now include some schedule information that should make this easier.
   - It is my fault for not being more careful but I cracked a microsd trying to get it out of the longest lived Pi - I'm not sure if it was the temperature and outside conditions but all of the microsds were more difficult to remove than I am used to. I don't see a sea of postings about this online so maybe just carelessness and bad luck, but I'm not sure how many Pis sit outside in the Arizona summer?
-  - I'm experimenting running one of my cameras via a [Pi Camera HDMI Cable Extension from Petit Studio on Tindie](https://www.tindie.com/products/freto/pi-camera-hdmi-cable-extension/) - working so far but only very short term so far.
  
 ### Backstory
 
 For a number of years my wife and I used a previous (now-archived) project - [cmiles/PiDropLapse](https://github.com/cmiles/PiDropLapse/tree/main) - and a [Raspberry Pi 4 Model B](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/) to take periodic photographs and sensor readings to monitor an area inside our house.
 
-Since moving to a more rural property several years ago I wanted to do a similar project but outside and solar powered. Raspberry Pi shortages around the time we moved, never quite finding an in-stock dedicated Pi solar setup that I loved and other house projects delayed the idea... Until 2023 when we installed a small offgrid solar system near our parking area. The main purpose of the solar system is to power the rodent deterrent lights for our trucks - but it has more than enough power to also power several Pis for photo purposes!
+Since moving to a more rural property I have wanted to do a similar project but outside and solar powered - Raspberry Pi shortages, never quite finding an in-stock dedicated Pi solar setup that I loved and other house projects delayed that idea...
+
+Recently we installed a 12V/200aH solar system near our parking area. The main purpose of this system is to power the rodent deterrent lights for our trucks - but luckily it has more than enough power to also power several Pis for photo purposes!
 
 ![EnclosureExample](PiSlicedDayMedia/PiSlicedDayPhotos-MostlyRecycledCameraEnclosure.jpg "The Pis I am currently housing are in simple enclosures built from spare/scrap wood, deck paint we already had and a Tiffen 55mm UV Protector Filter.")
 
