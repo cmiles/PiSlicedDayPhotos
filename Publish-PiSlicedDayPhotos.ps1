@@ -1,0 +1,1 @@
+dotnet publish .\PiSlicedDayPhotos\PiSlicedDayPhotos.csproj /p:PublishProfile=.\PiSlicedDayPhotos\Properties\PublishProfiles\FolderProfile.pubxml
