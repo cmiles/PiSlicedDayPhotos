@@ -6,7 +6,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Recognizers.Text.DateTime" Version="1.8.8" />
-    <PackageReference Include="ObjectDumper.NET" Version="4.2.7" />
+    <PackageReference Include="ObjectDumper.NET" Version="4.3.2" />
     <PackageReference Include="Serilog" Version="4.0.1" />
     <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
     <PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
