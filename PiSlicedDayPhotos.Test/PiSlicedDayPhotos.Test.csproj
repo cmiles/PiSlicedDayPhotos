@@ -25,6 +25,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="PiSlicedDayPhotos.Utility.BuildDateAttribute">
+      <_Parameter1>$([System.DateTime]::UtcNow.ToString("yyyyMMddHHmmss"))</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <GitVersion>false</GitVersion>
+    <Version>$([System.DateTime]::Now.ToString("yyyy.M.d.Hmm"))</Version>
+    <AssemblyVersion>$([System.DateTime]::Now.ToString("yyyy.M.d.Hmm"))</AssemblyVersion>
+    <FileVersion>$([System.DateTime]::Now.ToString("yyyy.M.d.Hmm"))</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
     <None Update="Image-Error-Test-Model-Difference-Mask.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
