@@ -12,13 +12,33 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="PointlessWaymarks.CommonTools.BuildDateAttribute">
+      <_Parameter1>$([System.DateTime]::UtcNow.ToString("yyyyMMddHHmmss"))</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <GitVersion>false</GitVersion>
+    <Version>$([System.DateTime]::Now.ToString("yyyy.M.d.Hmm"))</Version>
+    <AssemblyVersion>$([System.DateTime]::Now.ToString("yyyy.M.d.Hmm"))</AssemblyVersion>
+    <FileVersion>$([System.DateTime]::Now.ToString("yyyy.M.d.Hmm"))</FileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GitVersion>false</GitVersion>
+    <Version>$([System.DateTime]::Now.ToString("yyyy.M.d.Hmm"))</Version>
+    <AssemblyVersion>$([System.DateTime]::Now.ToString("yyyy.M.d.Hmm"))</AssemblyVersion>
+    <FileVersion>$([System.DateTime]::Now.ToString("yyyy.M.d.Hmm"))</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
     <PackageReference Include="GitInfo" Version="3.3.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Jot" Version="2.1.17" />
-    <PackageReference Include="Metalama.Framework" Version="2024.2.20" />
-    <PackageReference Include="Metalama.Patterns.Observability" Version="2024.2.20" />
+    <PackageReference Include="Metalama.Framework" Version="2024.2.24" />
+    <PackageReference Include="Metalama.Patterns.Observability" Version="2024.2.24" />
     <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.4.5" />
   </ItemGroup>
 

@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Metalama.Patterns.Observability" Version="2024.2.20" />
+    <PackageReference Include="Metalama.Patterns.Observability" Version="2024.2.24" />
     <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.4.5" />
     <PackageReference Include="Microsoft.Recognizers.Text.DateTime" Version="1.8.8" />
     <PackageReference Include="SkiaSharp" Version="2.88.8" />
@@ -14,5 +14,18 @@
   <ItemGroup>
     <ProjectReference Include="..\PointlessWaymarksTools\PointlessWaymarks.CommonTools\PointlessWaymarks.CommonTools.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="PointlessWaymarks.CommonTools.BuildDateAttribute">
+      <_Parameter1>$([System.DateTime]::UtcNow.ToString("yyyyMMddHHmmss"))</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <GitVersion>false</GitVersion>
+    <Version>$([System.DateTime]::Now.ToString("yyyy.M.d.Hmm"))</Version>
+    <AssemblyVersion>$([System.DateTime]::Now.ToString("yyyy.M.d.Hmm"))</AssemblyVersion>
+    <FileVersion>$([System.DateTime]::Now.ToString("yyyy.M.d.Hmm"))</FileVersion>
+  </PropertyGroup>
 
 </Project>
