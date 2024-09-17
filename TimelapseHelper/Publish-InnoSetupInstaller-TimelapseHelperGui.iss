@@ -7,7 +7,7 @@
 #endif
 
 #define MyAppPublisher "Charles Miles"
-#define MyAppOutputDir "M:\PiSlicedDayPhotos\PiSlicedDayPhotos.TimelapseHelperGuiInstallers"
+#define MyAppOutputDir "M:\PointlessWaymarksPublications\"
 
 #define MyAppDefaultGroupName "Pi Sliced-Day Photos"
 
@@ -15,7 +15,7 @@
 #define MyAppDefaultDirName "PiSlicedDayTimelapseHelper"
 #define MyAppExeName "PiSlicedDayPhotos.TimelapseHelperGui.exe"
 #define MyAppOutputBaseFilename "PiSlicedDayPhotosTimelapseHelperSetup--"
-#define MyAppFilesSource "M:\PiSlicedDayPhotos\PiSlicedDayPhotos.TimelapseHelperGui\*"
+#define MyAppFilesSource "M:\PointlessWaymarksPublications\PiSlicedDayPhotos.TimelapseHelperGui\*"
 
 [Setup]
 AppId={{c0d70534-5beb-4e90-b6ba-768e125b6279}
