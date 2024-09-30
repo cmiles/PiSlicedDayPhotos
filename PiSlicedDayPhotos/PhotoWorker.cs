@@ -13,7 +13,7 @@ public class PhotoWorker : BackgroundService
     private string ErrorImageFileName(PiSlicedDaySettings userSettings)
     {
         return Path.Combine(userSettings.PhotoStorageDirectory,
-            $"{DateTime.Now:yyyy-MM-dd-HH-mm-ss}-Error{(string.IsNullOrWhiteSpace(userSettings.PhotoSeriesName) ? "" : "-")}{userSettings.PhotoSeriesName}.jpg");
+            $"{DateTime.Now:yyyy-MM-dd-HH-mm-ss}-Error{(string.IsNullOrWhiteSpace(userSettings.PhotoSeriesName.SanitizeForFileName()) ? "" : "-")}{userSettings.PhotoSeriesName.SanitizeForFileName()}.jpg");
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
