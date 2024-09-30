@@ -14,7 +14,7 @@
 #define MyAppName "Pi Sliced-Day Photos Timelapse Helper"
 #define MyAppDefaultDirName "PiSlicedDayTimelapseHelper"
 #define MyAppExeName "PiSlicedDayPhotos.TimelapseHelperGui.exe"
-#define MyAppOutputBaseFilename "PiSlicedDayPhotosTimelapseHelperSetup--"
+#define MyAppOutputBaseFilename "PiSlicedDayPhotos-TimelapseHelperGui-Setup--"
 #define MyAppFilesSource "M:\PointlessWaymarksPublications\PiSlicedDayPhotos.TimelapseHelperGui\*"
 
 [Setup]
