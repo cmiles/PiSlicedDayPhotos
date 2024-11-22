@@ -53,7 +53,7 @@ _PhotoStorageDirectory_ - The path to where the photos are written.
 
 _SunriseSunsetCsvFile_ - The name (including extension) of the csv file of Sunrise and Sunset times.
 
-_PhotoNamePrefix_ - Prefix for the photo names. The date and time will follow the prefix and .jpg to create the filename. It is especially useful to change this if you have multiple cameras running.
+_PhotoSeriesName_ - Postfix for the photo name - this defaults to the machine name if not present.
 
 _LogFullExceptionsToImages_ - The assumption is that this program will run largely unattended and that most of the time the only thing you will see is the photographs. The program will try to alert you of errors by writing exception information to an image file in the PhotoStorageDirectory. This setting determines whether the program writes all of the exception information or only an abbreviated message. This option exists because writing full exception information may leak information about your setup!
 
@@ -118,15 +118,14 @@ I like to disable the LEDs to make sure that the glass covering the lens opening
   #Disable LAN LEDs
   dtparam=eth_led0=14
   dtparam=eth_led1=14
-  # Disable the ACT LED
   ```
 
 My preference is for Automatic/Unattended Upgrades - do this long enough and something unexpected will break, but I would rather stay up to date and have something break sooner rather than later. [Secure your Raspberry Pi by enabling automatic software updates – Sean Carney](https://www.seancarney.ca/2021/02/06/secure-your-raspberry-pi-by-enabling-automatic-software-updates/) and [UnattendedUpgrades - Debian Wiki](https://wiki.debian.org/UnattendedUpgrades)
-	```
-	sudo apt-get update
-	sudo apt-get install unattended-upgrades
-	sudo dpkg-reconfigure --priority=low unattended-upgrades
-	```
+  ```
+  sudo apt-get update
+  sudo apt-get install unattended-upgrades
+  sudo dpkg-reconfigure --priority=low unattended-upgrades
+  ```
 
 If you've worked in years gone by with the Pi Camera and C# you might know the very useful [techyian/MMALSharp: C# wrapper to Broadcom's MMAL with an API to the Raspberry Pi camera](https://github.com/techyian/MMALSharp) - unfortunately without choosing an older version of Raspberry Pi OS that library no longer works. The Pi has moved on to [libcamera](https://libcamera.org/). I didn't find a C# wrapper for libcamera and since I didn't need to do anything other than write stills to the Pi's storage calling libcamera-still 'command line style' seemed to be the best option.
 
@@ -145,7 +144,7 @@ For a number of years my wife and I used a previous (now-archived) project - [cm
 
 Since moving to a more rural property I have wanted to do a similar project but outside and solar powered - Raspberry Pi shortages, never quite finding an in-stock dedicated Pi solar setup that I loved and other house projects delayed that idea...
 
-Recently we installed a 12V/200aH solar system near our parking area. The main purpose of this system is to power the rodent deterrent lights for our trucks - but luckily it has more than enough power to also power several Pis for photo purposes!
+Recently we installed a 24V/100aH solar system near our parking area. The main purpose of this system is to power the rodent deterrent lights for our trucks - but luckily it has more than enough power to also power several Pis for photo purposes!
 
 ![EnclosureExample](PiSlicedDayMedia/PiSlicedDayPhotos-MostlyRecycledCameraEnclosure.jpg "The Pis I am currently housing are in simple enclosures built from spare/scrap wood, deck paint we already had and a Tiffen 55mm UV Protector Filter.")
 
