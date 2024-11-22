@@ -20,7 +20,7 @@
     <Grid>
         <TabControl>
             <TabItem Header="Single Time Description">
-                <controls:TimelapseSingleTimeDescriptionGeneratorControl DataContext="{Binding SingleTimeDescriptionContext}"></controls:TimelapseSingleTimeDescriptionGeneratorControl>
+                <controls:SingleTimeDescriptionGeneratorControl DataContext="{Binding SingleTimeDescriptionContext}"></controls:SingleTimeDescriptionGeneratorControl>
             </TabItem>
             <TabItem Header="Year Comp">
                 <controls:YearCompGeneratorControl DataContext="{Binding YearCompContext}"></controls:YearCompGeneratorControl>

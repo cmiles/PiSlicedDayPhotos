@@ -47,7 +47,7 @@ public partial class MainWindow
         StatusContext.RunFireAndForgetBlockingTask(Setup);
     }
 
-    public TimelapseSingleTimeDescriptionGeneratorContext? SingleTimeDescriptionContext { get; set; }
+    public SingleTimeDescriptionGeneratorContext? SingleTimeDescriptionContext { get; set; }
     public YearCompGeneratorContext? YearCompContext { get; set; }
     public GridImageGeneratorContext? GridImageContext { get; set; }
     public AppSettingsContext? SettingsContext { get; set; }
@@ -57,7 +57,7 @@ public partial class MainWindow
 
     private async Task Setup()
     {
-        SingleTimeDescriptionContext = await TimelapseSingleTimeDescriptionGeneratorContext.CreateInstance(StatusContext);
+        SingleTimeDescriptionContext = await SingleTimeDescriptionGeneratorContext.CreateInstance(StatusContext);
         YearCompContext = await YearCompGeneratorContext.CreateInstance(StatusContext);
         GridImageContext = await GridImageGeneratorContext.CreateInstance(StatusContext);
         SettingsContext = await AppSettingsContext.CreateInstance(StatusContext);

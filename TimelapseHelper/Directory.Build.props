@@ -4,7 +4,7 @@
     <Platforms>x64</Platforms>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>12.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <DebugType>embedded</DebugType>

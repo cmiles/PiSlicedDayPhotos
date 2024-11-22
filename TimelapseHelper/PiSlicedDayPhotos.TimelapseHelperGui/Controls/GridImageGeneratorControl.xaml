@@ -140,24 +140,31 @@
             <GroupBox.Header>
                 <TextBlock FontWeight="Bold">Settings</TextBlock>
             </GroupBox.Header>
-            <StackPanel Margin="0,0,0,6" Orientation="Horizontal">
-                <conversionDataEntry:ConversionDataEntryControl Width="120" DataContext="{Binding TimeLapseStartsOnEntry}" />
-                <conversionDataEntry:ConversionDataEntryControl Width="120" DataContext="{Binding TimeLapseEndsOnEntry}" />
-                <conversionDataEntry:ConversionDataEntryControl Width="120" DataContext="{Binding FrameRateDataEntry}" />
-                <boolDataEntry:BoolDataEntryControl
-                    Margin="6,0,0,0"
-                    VerticalAlignment="Bottom"
-                    DataContext="{Binding WriteCaptionDataEntry}" />
-                <conversionDataEntry:ConversionDataEntryControl Width="120" DataContext="{Binding CaptionFontSizeEntry}" />
-                <stringDataEntry:StringDataEntryControl Width="120" DataContext="{Binding CaptionFormatEntry}" />
-                <TextBlock
-                    Width="120"
-                    Margin="10,0,4,2"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Bottom"
-                    Text="{Binding CaptionFormatSample}"
-                    TextWrapping="Wrap" />
-            </StackPanel>
+            <WrapPanel Margin="0,0,0,6" Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal">
+                    <conversionDataEntry:ConversionDataEntryControl Width="160" DataContext="{Binding TimeLapseStartsOnEntry}" />
+                    <conversionDataEntry:ConversionDataEntryControl Width="160" DataContext="{Binding TimeLapseEndsOnEntry}" />
+                    <conversionDataEntry:ConversionDataEntryControl
+                        Width="90"
+                        Margin="0,0,22,0"
+                        DataContext="{Binding FrameRateDataEntry}" />
+                </StackPanel>
+                <StackPanel Margin="8,0,0,0" Orientation="Horizontal">
+                    <boolDataEntry:BoolDataEntryControl
+                        Margin="0,0,0,2"
+                        VerticalAlignment="Bottom"
+                        DataContext="{Binding WriteCaptionDataEntry}" />
+                    <conversionDataEntry:ConversionDataEntryControl Width="120" DataContext="{Binding CaptionFontSizeEntry}" />
+                    <stringDataEntry:StringDataEntryControl Width="120" DataContext="{Binding CaptionFormatEntry}" />
+                    <TextBlock
+                        Width="120"
+                        Margin="10,0,4,2"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Bottom"
+                        Text="{Binding CaptionFormatSample}"
+                        TextWrapping="Wrap" />
+                </StackPanel>
+            </WrapPanel>
         </GroupBox>
         <Grid Grid.Row="3">
             <GroupBox

@@ -75,7 +75,7 @@ public static class PowerShellRun
 
             while (pipeline.PipelineStateInfo.State == PipelineState.Running) await Task.Delay(250);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return (true, pipeline.HadErrors, returnLog.OrderBy(x => x.Item1).Select(x => x.Item2).ToList());
         }

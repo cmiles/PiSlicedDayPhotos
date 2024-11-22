@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using PiSlicedDayPhotos.TimelapseHelper;
 using PiSlicedDayPhotos.TimelapseHelperTools;
 using PointlessWaymarks.CommonTools;
 
@@ -214,5 +213,3 @@ else
     Console.WriteLine($"TimelapseType {settings.TimelapseType} is not supported.");
     return -1;
 }
-
-return 0;

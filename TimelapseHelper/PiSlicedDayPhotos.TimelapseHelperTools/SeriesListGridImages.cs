@@ -224,8 +224,8 @@ public static class SeriesListGridImages
 
     private class GridPhotoGroup
     {
-        public required string Description { get; set; }
-        public required DateTime ReferenceDateTime { get; set; }
-        public List<PiSlicedDayPhotoInformation> Photos { get; set; } = [];
+        public required string Description { get; init; }
+        public required DateTime ReferenceDateTime { get; init; }
+        public List<PiSlicedDayPhotoInformation> Photos { get; } = [];
     }
 }

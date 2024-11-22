@@ -1,4 +1,4 @@
-﻿namespace PiSlicedDayPhotos.TimelapseHelper;
+﻿namespace PiSlicedDayPhotos.TimelapseHelperTools;
 
 public class TimelapseHelperConsoleSettings
 {

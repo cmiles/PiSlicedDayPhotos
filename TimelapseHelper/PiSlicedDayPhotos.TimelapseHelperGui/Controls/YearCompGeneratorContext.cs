@@ -5,7 +5,6 @@ using System.IO;
 using System.Text.Json;
 using Metalama.Patterns.Observability;
 using Ookii.Dialogs.Wpf;
-using PiSlicedDayPhotos.TimelapseHelper;
 using PiSlicedDayPhotos.TimelapseHelperTools;
 using PointlessWaymarks.LlamaAspects;
 using PointlessWaymarks.WpfCommon;
@@ -54,14 +53,14 @@ public partial class YearCompGeneratorContext
         var factoryStartsOnEntry =
             await ConversionDataEntryNoChangeIndicatorContext<DateTime?>.CreateInstance(ConversionDataEntryHelpers
                 .DateTimeNullableConversion);
-        factoryStartsOnEntry.Title = "Main Year After";
+        factoryStartsOnEntry.Title = "Main Year - On or After Date/Time";
         factoryStartsOnEntry.HelpText =
             "Only include photos taken on or after this date for the main (last) timeline of the comp series.";
 
         var factoryEndsOnEntry =
             await ConversionDataEntryNoChangeIndicatorContext<DateTime?>.CreateInstance(ConversionDataEntryHelpers
                 .DateTimeNullableConversion);
-        factoryEndsOnEntry.Title = "Main Year Before";
+        factoryEndsOnEntry.Title = "Main Year - On or Before Date/Time";
         factoryEndsOnEntry.HelpText =
             "Only include photos taken on or before this date for the main (last) timeline of the comp series.";
 
@@ -298,7 +297,7 @@ public partial class YearCompGeneratorContext
 
         if (!folderPicker.SelectedPaths.Any())
         {
-            StatusContext.ToastWarning("No directories selected?");
+            await StatusContext.ToastWarning("No directories selected?");
             return;
         }
 
@@ -346,8 +345,9 @@ public partial class YearCompGeneratorContext
             seriesOrder.Add(SeriesItems.IndexOf(SeriesItems.First(x => x.SeriesName == loopSelectedSeriesNames)),
                 loopSelectedSeriesNames);
 
+        //The MainTimelineStartsOnEntry and MainTimelineEndsOnEntry are checked for values in CheckCanCreateTimelapseAndFfmpegExe
         var result = YearCompSingleTimeDescription.YearCompSingleTimeDescriptionTimelapseFiles(SelectedPhotos.ToList(),
-            MainTimelineStartsOnEntry.UserValue.Value, MainTimelineEndsOnEntry.UserValue.Value,
+            MainTimelineStartsOnEntry.UserValue!.Value, MainTimelineEndsOnEntry.UserValue!.Value,
             seriesOrder, FrameRateDataEntry.UserValue, shouldRunCheck.Item2, StatusContext.ProgressTracker(),
             WriteCaptionDataEntry.UserValue, CaptionFormatEntry.UserValue, CaptionFontSizeEntry.UserValue);
 
@@ -412,43 +412,43 @@ public partial class YearCompGeneratorContext
 
         if (MainTimelineStartsOnEntry.HasValidationIssues || MainTimelineStartsOnEntry.UserValue is null)
         {
-            StatusContext.ToastError("Please fill in a Start Date/Time for the most recent year photo set");
+            await StatusContext.ToastError("Please fill in a Start Date/Time for the most recent year photo set");
             return (false, string.Empty);
         }
 
         if (MainTimelineEndsOnEntry.HasValidationIssues || MainTimelineEndsOnEntry.UserValue is null)
         {
-            StatusContext.ToastError("Please fill in an End Date/Time for the most recent year photo set");
+            await StatusContext.ToastError("Please fill in an End Date/Time for the most recent year photo set");
             return (false, string.Empty);
         }
 
         if (SelectedSeriesItems().Count == 0)
         {
-            StatusContext.ToastError("No Series Selected?");
+            await StatusContext.ToastError("No Series Selected?");
             return (false, string.Empty);
         }
 
         if (SelectedTimeDescriptionItems().Count == 0)
         {
-            StatusContext.ToastError("No Time Descriptions Selected?");
+            await StatusContext.ToastError("No Time Descriptions Selected?");
             return (false, string.Empty);
         }
 
         if (SelectedTimeDescriptionItems().Count > 1)
         {
-            StatusContext.ToastError("Please select a single Time Description");
+            await StatusContext.ToastError("Please select a single Time Description");
             return (false, string.Empty);
         }
 
         if (FrameRateDataEntry.HasValidationIssues)
         {
-            StatusContext.ToastError("Frame Rate Entry Issues?");
+            await StatusContext.ToastError("Frame Rate Entry Issues?");
             return (false, string.Empty);
         }
 
         if (!SelectedPhotos.Any())
         {
-            StatusContext.ToastError("The current settings don't include any photos?");
+            await StatusContext.ToastError("The current settings don't include any photos?");
             return (false, string.Empty);
         }
 
@@ -464,7 +464,7 @@ public partial class YearCompGeneratorContext
 
         if (!File.Exists(ffmpegExe))
         {
-            StatusContext.ToastError("FFMPEG Executable Not Found?");
+            await StatusContext.ToastError("FFMPEG Executable Not Found?");
             return (false, string.Empty);
         }
 
@@ -492,8 +492,9 @@ public partial class YearCompGeneratorContext
             seriesOrder.Add(SeriesItems.IndexOf(SeriesItems.First(x => x.SeriesName == loopSelectedSeriesNames)),
                 loopSelectedSeriesNames);
 
+        //The MainTimelineStartsOnEntry and MainTimelineEndsOnEntry are checked for values in CheckCanCreateTimelapseAndFfmpegExe
         var result = await YearCompSingleTimeDescription.YearCompSingleTimeDescriptionTimelapse(SelectedPhotos.ToList(),
-            MainTimelineStartsOnEntry.UserValue.Value, MainTimelineEndsOnEntry.UserValue.Value,
+            MainTimelineStartsOnEntry.UserValue!.Value, MainTimelineEndsOnEntry.UserValue!.Value,
             seriesOrder, FrameRateDataEntry.UserValue, shouldRunCheck.Item2, StatusContext.ProgressTracker(),
             WriteCaptionDataEntry.UserValue, CaptionFormatEntry.UserValue, CaptionFontSizeEntry.UserValue);
 

@@ -5,7 +5,6 @@ using System.IO;
 using System.Text.Json;
 using Metalama.Patterns.Observability;
 using Ookii.Dialogs.Wpf;
-using PiSlicedDayPhotos.TimelapseHelper;
 using PiSlicedDayPhotos.TimelapseHelperTools;
 using PointlessWaymarks.LlamaAspects;
 using PointlessWaymarks.WpfCommon;
@@ -18,9 +17,9 @@ namespace PiSlicedDayPhotos.TimelapseHelperGui.Controls;
 
 [Observable]
 [GenerateStatusCommands]
-public partial class TimelapseSingleTimeDescriptionGeneratorContext
+public partial class SingleTimeDescriptionGeneratorContext
 {
-    public TimelapseSingleTimeDescriptionGeneratorContext()
+    public SingleTimeDescriptionGeneratorContext()
     {
         PropertyChanged += OnPropertyChanged;
     }
@@ -42,7 +41,7 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
     public required ConversionDataEntryNoChangeIndicatorContext<DateTime?> TimeLapseEndsOnEntry { get; set; }
     public string? CaptionFormatSample { get; set; } = string.Empty;
 
-    public static async Task<TimelapseSingleTimeDescriptionGeneratorContext> CreateInstance(
+    public static async Task<SingleTimeDescriptionGeneratorContext> CreateInstance(
         StatusControlContext statusContext)
     {
         await ThreadSwitcher.ResumeForegroundAsync();
@@ -54,14 +53,14 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
         var factoryStartsOnEntry =
             await ConversionDataEntryNoChangeIndicatorContext<DateTime?>.CreateInstance(ConversionDataEntryHelpers
                 .DateTimeNullableConversion);
-        factoryStartsOnEntry.Title = "Photos After";
-        factoryStartsOnEntry.HelpText = "Only include photos taken on or after this date.";
+        factoryStartsOnEntry.Title = "Photos After Date/Time";
+        factoryStartsOnEntry.HelpText = "Only include photos taken on or after this date - blank will start with the Earliest Possible Photo.";
 
         var factoryEndsOnEntry =
             await ConversionDataEntryNoChangeIndicatorContext<DateTime?>.CreateInstance(ConversionDataEntryHelpers
                 .DateTimeNullableConversion);
-        factoryEndsOnEntry.Title = "Photos Before";
-        factoryEndsOnEntry.HelpText = "Only include photos taken on or before this date.";
+        factoryEndsOnEntry.Title = "Photos Before Date/Time";
+        factoryEndsOnEntry.HelpText = "Only include photos taken on or before this date - blank will start with the Last Possible Photo.";
 
         var factoryFrameRateEntry = await ConversionDataEntryNoChangeIndicatorContext<int>.CreateInstance(
             ConversionDataEntryHelpers
@@ -94,7 +93,7 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
         factoryYearComparisonEntry.HelpText =
             "If checked the timelapse will be created with a comparison of the same day from the previous year.";
 
-        var newControl = new TimelapseSingleTimeDescriptionGeneratorContext
+        var newControl = new SingleTimeDescriptionGeneratorContext
         {
             SeriesItems = factorySeriesItems,
             TimeDescriptionItems = factoryTimeDescriptionItems,
@@ -274,7 +273,7 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
 
         if (!folderPicker.SelectedPaths.Any())
         {
-            StatusContext.ToastWarning("No directories selected?");
+            await StatusContext.ToastWarning("No directories selected?");
             return;
         }
 
@@ -335,31 +334,31 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
 
         if (SelectedSeriesItems().Count == 0)
         {
-            StatusContext.ToastError("No Series Selected?");
+            await StatusContext.ToastError("No Series Selected?");
             return (false, string.Empty);
         }
 
         if (SelectedTimeDescriptionItems().Count == 0)
         {
-            StatusContext.ToastError("No Time Descriptions Selected?");
+            await StatusContext.ToastError("No Time Descriptions Selected?");
             return (false, string.Empty);
         }
 
         if (SelectedTimeDescriptionItems().Count > 1)
         {
-            StatusContext.ToastError("Please select a single Time Description");
+            await StatusContext.ToastError("Please select a single Time Description");
             return (false, string.Empty);
         }
 
         if (FrameRateDataEntry.HasValidationIssues)
         {
-            StatusContext.ToastError("Frame Rate Entry Issues?");
+            await StatusContext.ToastError("Frame Rate Entry Issues?");
             return (false, string.Empty);
         }
 
         if (!SelectedPhotos.Any())
         {
-            StatusContext.ToastError("The current settings don't include any photos?");
+            await StatusContext.ToastError("The current settings don't include any photos?");
             return (false, string.Empty);
         }
 
@@ -375,7 +374,7 @@ public partial class TimelapseSingleTimeDescriptionGeneratorContext
 
         if (!File.Exists(ffmpegExe))
         {
-            StatusContext.ToastError("FFMPEG Executable Not Found?");
+            await StatusContext.ToastError("FFMPEG Executable Not Found?");
             return (false, string.Empty);
         }
 
