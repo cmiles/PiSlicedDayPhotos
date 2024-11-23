@@ -47,7 +47,7 @@ var piRemoteProgramDirectory = $"/home/{username}/PiSlicedDayPhotos";
 var password = Args[1];
 var host = Args[2];
 
-var piSlicedPhotosLocalPublishDirectory = @"M:\PiSlicedDayPhotos";
+var piSlicedPhotosLocalPublishDirectory = @"M:\PointlessWaymarksPublications\PiSlicedDayPhotos";
 
 CopyExecutableTo(host, username, password, piSlicedPhotosLocalPublishDirectory, piRemoteProgramDirectory);
 

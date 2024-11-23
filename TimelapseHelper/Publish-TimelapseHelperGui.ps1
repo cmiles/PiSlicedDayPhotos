@@ -16,7 +16,7 @@ $msBuild = & $vsWhere -latest -requires Microsoft.Component.MSBuild -find MSBuil
 
 if ($lastexitcode -ne 0) { throw ("Exec: " + $errorMessage) }
 
-$publishPath = "M:\PiSlicedDayPhotos\PiSlicedDayPhotos.TimelapseHelperGui"
+$publishPath = "M:\PointlessWaymarksPublications\PiSlicedDayPhotos.TimelapseHelperGui"
 if(!(test-path -PathType container $publishPath)) { New-Item -ItemType Directory -Path $publishPath }
 
 Remove-Item -Path $publishPath\* -Recurse
