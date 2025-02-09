@@ -1,3 +1,9 @@
+## This project has moved to the [Pi Sliced Day Photos Fossil Repository](https://chiselapp.com/user/cmiles/repository/pi-sliced-day-photos/) with a GitHub Mirror [here](https://github.com/cmiles/PiSlicedDayPhotos02).
+
+## Thank You to everyone who starred or looked at this project and code - I hope you will continue to watch the project via the [mirror](https://github.com/cmiles/PiSlicedDayPhotos02), the [Fossil Repository](https://chiselapp.com/user/cmiles/repository/pi-sliced-day-photos/) or the [Pointless Waymarks Software Website](https://software.pointlesswaymarks.com/).
+
+## Thank You to everyone who has spent time contributing to Free/Libre/Open software!
+
 ## Pi Sliced Day Photos
 
 This is a small .NET Core (C#) program designed to be run on a Raspberry Pi that takes photographs at Sunrise, Sunset, a number intervals in-between and at custom times specified either by clock time or minutes +/- from sunrise/sunset.
